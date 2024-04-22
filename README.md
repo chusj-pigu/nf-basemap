@@ -1,6 +1,6 @@
 # wf-mapping
 
-Nexftlow workflow for mapping of fastq reads using minimap2, samtools and multiqc.
+Nexftlow workflow for mapping of Nanopore fastq reads using minimap2, samtools and multiqc.
 
 Requires either [Docker], [Singularity] or [Apptainer] installed.
 
