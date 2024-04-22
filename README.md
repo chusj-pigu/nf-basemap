@@ -18,7 +18,7 @@ Mapping of the reads is done with [minimap2] using `-ax -map-ont` options for lo
 Using [samtools], the .sam file is first converted to .bam using `samtools view`, sorted with `samtools sort` and indexed using `samtools index`. Statistics are reported with `samtools stats` and `multiqc`. 
 
 ## Outputs 
-Generates a .sam file, .bam files for sorted and indexed reads, sorted.stats text file for general statistics of the mapping and the [multiqc] report.
+Generates a .sam file, .bam files for sorted and indexed reads, sorted.stats text file for general statistics of the mapping and a [multiqc] report.
 
 
 
