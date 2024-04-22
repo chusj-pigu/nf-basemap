@@ -7,7 +7,7 @@ Requires either [Docker], [Singularity] or [Apptainer] installed.
 Usage:
 
 ```sh
-nextflow run charlenelawdes/wf-mapping --reads /path/to/fq.gz --ref /path/to/ref.fasta
+nextflow run chusj-pigu/wf-mapping --reads /path/to/fq.gz --ref /path/to/ref.fasta
 ```
 Overview:
 
