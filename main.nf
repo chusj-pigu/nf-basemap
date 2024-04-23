@@ -7,7 +7,7 @@ def helpMessage() {
         nextflow run chusj-pigu/wf-mapping --reads SAMPLE_ID.fq.gz --ref REF.fasta
 
         Mandatory arguments:
-         --reads                            Path to the input file in FASTQ format or uBAM if used with --bam
+         --reads                        Path to the input file in FASTQ format or uBAM if used with --bam
          --ref                          Path to the reference fasta file 
 
          Optional arguments:
