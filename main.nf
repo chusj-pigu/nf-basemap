@@ -4,7 +4,7 @@ def helpMessage() {
   log.info """
         Usage:
         The typical command for running the pipeline is as follows:
-        nextflow run charlenelawdes/wf-mapping --reads SAMPLE_ID.fastq --ref REF.fasta
+        nextflow run chusj-pigu/wf-mapping --reads SAMPLE_ID.fastq --ref REF.fasta
 
         Mandatory arguments:
          --reads                        Path to the input fastq file 
@@ -12,8 +12,7 @@ def helpMessage() {
 
          Optional arguments:
          --out_dir                      Output directory to place mapped files and reports in
-         --sample_id                    String to prefix output files with [default: aligned]
-         --threads                      Number of CPUs to use [default: 4]
+         --t                            Number of CPUs to use [default: 4]
          -profiles                      Use Docker, Singularity or Apptainer to run the workflow [default: Docker]
          --help                         This usage statement.
         """
@@ -37,11 +36,11 @@ process mapping {
     path fastq
 
     output:
-    path "${params.sample_id}.sam"
+    path "${fastq.getBaseName(2)}.sam"
 
     script:
     """
-    minimap2 -ax map-ont -t $task.cpus $ref $fastq > ${params.sample_id}.sam
+    minimap2 -ax map-ont -t $task.cpus $ref $fastq > "${fastq.getBaseName(2)}.sam"
     """
 }
 
@@ -54,11 +53,11 @@ process sam_to_bam {
     path sam
 
     output:
-    path "${params.sample_id}.bam"
+    path "${sam.baseName}.bam"
 
     script:
     """
-    samtools view -@ $task.cpus -Sb $sam > ${params.sample_id}.bam
+    samtools view -@ $task.cpus -Sb $sam > ${sam.baseName}.bam
     """
 }
 
@@ -71,11 +70,11 @@ process sam_sort {
     path aligned
 
     output:
-    path "${params.sample_id}_sorted.bam"
+    path "${aligned.baseName}_sorted.bam"
 
     script:
     """
-    samtools sort -@ $task.cpus $aligned > ${params.sample_id}_sorted.bam
+    samtools sort -@ $task.cpus $aligned > ${aligned.baseName}_sorted.bam
     """
 }
 
@@ -88,11 +87,11 @@ process sam_index {
     path sorted
 
     output:
-    path "${params.sample_id}_index.bam"
+    path "${sorted.baseName}_index.bam"
 
     script:
     """
-    samtools index -@ $task.cpus $sorted > ${params.sample_id}_index.bam
+    samtools index -@ $task.cpus $sorted > ${sorted.baseName}_index.bam
     """
 }
 
@@ -105,11 +104,11 @@ process sam_stats {
     path sorted
 
     output:
-    path "${params.sample_id}_sorted.stats.txt"
+    path "${sorted.baseName}.stats.txt"
 
     script:
     """
-    samtools stats -@ $task.cpus $sorted > ${params.sample_id}_sorted.stats.txt
+    samtools stats -@ $task.cpus $sorted > ${sorted.baseName}.stats.txt
     """
 }
 
