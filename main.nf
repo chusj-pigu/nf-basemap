@@ -4,15 +4,17 @@ def helpMessage() {
   log.info """
         Usage:
         The typical command for running the pipeline is as follows:
-        nextflow run chusj-pigu/wf-mapping --reads SAMPLE_ID.fastq --ref REF.fasta
+        nextflow run chusj-pigu/wf-mapping --reads SAMPLE_ID.fq.gz --ref REF.fasta
 
         Mandatory arguments:
-         --reads                        Path to the input fastq file 
+         --reads                            Path to the input file in FASTQ format or uBAM if used with --bam
          --ref                          Path to the reference fasta file 
 
          Optional arguments:
-         --out_dir                      Output directory to place mapped files and reports in
+         --out_dir                      Output directory to place mapped files and reports in [default: output]
          --t                            Number of CPUs to use [default: 4]
+         --m                            Conserve base modification information
+         --bam                          Take an uBAM file as input
          -profiles                      Use Docker, Singularity or Apptainer to run the workflow [default: Docker]
          --help                         This usage statement.
         """
@@ -24,7 +26,23 @@ if (params.help) {
     exit 0
 }
 
-// Mapping of FASTQ files
+process ubam_to_fastq {
+    publishDir="${launchDir}/output/"
+    cpus params.t
+    label "samtools"
+
+    input:
+    path ubam
+
+    output:
+    path "${ubam.baseName}.fq.gz"
+
+    script:
+    def m = params.m ? "-T '*'" : "" 
+    """
+    samtools fastq $m -@ $task.cpus $ubam > "${ubam.baseName}.fq.gz" 
+    """
+}
 
 process mapping {
     cpus params.t
@@ -39,8 +57,9 @@ process mapping {
     path "${fastq.getBaseName(2)}.sam"
 
     script:
+    def m = params.m ? "-y" : ""
     """
-    minimap2 -ax map-ont -t $task.cpus $ref $fastq > "${fastq.getBaseName(2)}.sam"
+    minimap2 -ax map-ont $m -t $task.cpus $ref $fastq > "${fastq.getBaseName(2)}.sam"
     """
 }
 
@@ -130,9 +149,15 @@ process multiqc {
 
 
 workflow {
-    reads_ch = Channel.fromPath(params.reads)
     ref_ch = Channel.fromPath(params.ref)
-    mapping(ref_ch,reads_ch)
+    reads_ch = Channel.fromPath(params.reads) 
+    if ( params. bam ) {
+        ubam_to_fastq(reads_ch)
+        mapping(ref_ch, ubam_to_fastq.out)
+    }
+    else {
+       mapping(ref_ch,reads_ch) 
+    }
     sam_to_bam(mapping.out)
     sam_sort(sam_to_bam.out)
     sam_index(sam_sort.out)
