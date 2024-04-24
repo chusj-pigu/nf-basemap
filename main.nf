@@ -26,145 +26,34 @@ if (params.help) {
     exit 0
 }
 
-process ubam_to_fastq {
-    publishDir="${launchDir}/output/"
-    cpus params.t
-    label "samtools"
-
-    input:
-    path ubam
-
-    output:
-    path "${ubam.baseName}.fq.gz"
-
-    script:
-    def m = params.m ? "-T '*'" : "" 
-    """
-    samtools fastq $m -@ $task.cpus $ubam > "${ubam.baseName}.fq.gz" 
-    """
-}
-
-process mapping {
-    cpus params.t
-    publishDir "${params.out_dir}"
-    label "minimap"
-
-    input:
-    path ref
-    path fastq
-
-    output:
-    path "${fastq.getBaseName(2)}.sam"
-
-    script:
-    def m = params.m ? "-y" : ""
-    """
-    minimap2 -ax map-ont $m -t $task.cpus $ref $fastq > "${fastq.getBaseName(2)}.sam"
-    """
-}
-
-process sam_to_bam {
-    cpus params.t
-    publishDir "${params.out_dir}"
-    label "samtools"
-
-    input:
-    path sam
-
-    output:
-    path "${sam.baseName}.bam"
-
-    script:
-    """
-    samtools view -@ $task.cpus -Sb $sam > ${sam.baseName}.bam
-    """
-}
-
-process sam_sort {
-    cpus params.t
-    publishDir "${params.out_dir}"
-    label "samtools"
-
-    input:
-    path aligned
-
-    output:
-    path "${aligned.baseName}_sorted.bam"
-
-    script:
-    """
-    samtools sort -@ $task.cpus $aligned > ${aligned.baseName}_sorted.bam
-    """
-}
-
-process sam_index {
-    cpus params.t
-    publishDir "${params.out_dir}"
-    label "samtools"
-
-    input:
-    path sorted
-
-    output:
-    path "${sorted.baseName}_index.bam"
-
-    script:
-    """
-    samtools index -@ $task.cpus $sorted > ${sorted.baseName}_index.bam
-    """
-}
-
-process sam_stats {
-    cpus params.t
-    publishDir "${params.out_dir}"
-    label "samtools"
-
-    input:
-    path sorted
-
-    output:
-    path "${sorted.baseName}.stats.txt"
-
-    script:
-    """
-    samtools stats -@ $task.cpus $sorted > ${sorted.baseName}.stats.txt
-    """
-}
-
-process multiqc {
-    publishDir "${params.out_dir}" 
-    
-    input:
-    path "${params.out_dir}/*"
-
-    output:
-    path "multiqc_report.html"
-
-    script:
-    """
-    multiqc .
-    """
-
-}
-
+include { ubam_to_fastq } from './modules/ubam_conv'
+include { qc_fastq} from './modules/qc'
+include { mapping } from './modules/map'
+include { sam_to_bam } from './modules/sams'
+include { sam_sort } from './modules/sams'
+include { sam_index } from './modules/sams'
+include { sam_stats } from './modules/sams'
+include { multiqc } from './modules/multiqc'
 
 workflow {
     ref_ch = Channel.fromPath(params.ref)
     reads_ch = Channel.fromPath(params.reads) 
     if ( params. bam ) {
         ubam_to_fastq(reads_ch)
+        qc_fastq(ubam_to_fastq.out)
         mapping(ref_ch, ubam_to_fastq.out)
     }
     else {
-       mapping(ref_ch,reads_ch) 
+        qc_fastq(reads_ch)
+        mapping(ref_ch,reads_ch)
     }
     sam_to_bam(mapping.out)
-    sam_sort(sam_to_bam.out)
-    sam_index(sam_sort.out)
-    sam_stats(sam_sort.out)
-    multi_ch = Channel.empty()
-        .mix(sam_stats.out)
-        .collect()
-        .set { stat_files }
-    multiqc(stat_files)
+        sam_sort(sam_to_bam.out)
+        sam_index(sam_sort.out)
+        sam_stats(sam_sort.out)
+        multi_ch = Channel.empty()
+            .mix(qc_fastq.out)
+            .mix(sam_stats.out)
+            .collect()
+        multiqc(multi_ch)
 }
