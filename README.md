@@ -10,7 +10,10 @@ Usage:
 nextflow run chusj-pigu/wf-mapping [--reads INPUT] [--ref REF_GENOME] [OPTIONS]
 ```
 
-To list available options and parameters for this workflow, run `nextflow run chusj-pigu/wf-mapping --help`
+To list available options and parameters for this workflow, run :
+``` sh
+nextflow run chusj-pigu/wf-mapping --help
+```
 
 Overview:
 
