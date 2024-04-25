@@ -26,14 +26,14 @@ if (params.help) {
     exit 0
 }
 
-include { ubam_to_fastq } from './modules/ubam_conv'
-include { qc_fastq} from './modules/qc'
-include { mapping } from './modules/map'
-include { sam_to_bam } from './modules/sams'
-include { sam_sort } from './modules/sams'
-include { sam_index } from './modules/sams'
-include { sam_stats } from './modules/sams'
-include { multiqc } from './modules/multiqc'
+include { ubam_to_fastq } from './subworkflows/ubam_fastq'
+include { qc_fastq} from './subworkflows/fastp'
+include { mapping } from './subworkflows/mapping'
+include { sam_to_bam } from './subworkflows/samtools'
+include { sam_sort } from './subworkflows/samtools'
+include { sam_index } from './subworkflows/samtools'
+include { sam_stats } from './subworkflows/samtools'
+include { multiqc } from './subworkflows/multiqc'
 
 workflow {
     ref_ch = Channel.fromPath(params.ref)
