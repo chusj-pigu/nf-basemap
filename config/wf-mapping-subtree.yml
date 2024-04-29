@@ -1,0 +1,31 @@
+name: subtree-matrix
+
+on: [push]
+
+jobs:
+  sync-downstream:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        path:
+          - samtools
+          - mapping
+          - multiqc
+          - fastp
+          - ubam_fastq
+
+    name: Update downstream ${{ matrix.path }} package
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: NxtLvLSoftware/git-subtree-action@1.1
+        with:
+          repo: 'chusj-pigu/subworkflows/${{ matrix.path }}'
+          path: 'chusj-pigu/wf-mapping/subworkflows/${{ matrix.path }}'
+          deploy_key: ${{ secrets.DOWNSTREAM_GITHUB_DEPLOY_KEY }}
+          force: true # will force push to the downstream repository
