@@ -1,5 +1,5 @@
 process basecall {
-    publishDir "${params.out_dir}"
+    publishDir "${params.outdir}"
     label "dorado"
     label "gpu"
     cpus params.t

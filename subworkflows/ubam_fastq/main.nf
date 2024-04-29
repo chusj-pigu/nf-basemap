@@ -1,5 +1,5 @@
 process ubam_to_fastq {
-    publishDir "${params.out_dir}"
+    publishDir "${params.outdir}"
     cpus params.t
     label "samtools"
 

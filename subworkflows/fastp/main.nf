@@ -1,6 +1,6 @@
 process qc_fastq {
     label "fastp" 
-    publishDir "${params.out_dir}", mode: "copy"
+    publishDir "${params.outdir}", mode: "copy"
 
     input:
     path fastq

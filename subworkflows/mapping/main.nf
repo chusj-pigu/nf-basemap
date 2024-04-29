@@ -1,6 +1,6 @@
 process mapping {
     cpus params.t
-    publishDir "${params.out_dir}"
+    publishDir "${params.outdir}"
     label "minimap"
 
     input:

@@ -1,8 +1,8 @@
 process multiqc {
-    publishDir "${params.out_dir}" 
+    publishDir "${params.outdir}" 
     
     input:
-    path "${params.out_dir}/*"
+    path "${params.outdir}/*"
 
     output:
     path "multiqc_report.html"

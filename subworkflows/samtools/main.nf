@@ -1,6 +1,6 @@
 process sam_to_bam {
     cpus params.t
-    publishDir "${params.out_dir}"
+    publishDir "${params.outdir}"
     label "samtools"
 
     input:
@@ -17,7 +17,7 @@ process sam_to_bam {
 
 process sam_sort {
     cpus params.t
-    publishDir "${params.out_dir}"
+    publishDir "${params.outdir}"
     label "samtools"
 
     input:
@@ -34,7 +34,7 @@ process sam_sort {
 
 process sam_index {
     cpus params.t
-    publishDir "${params.out_dir}"
+    publishDir "${params.outdir}"
     label "samtools"
 
     input:
@@ -51,7 +51,7 @@ process sam_index {
 
 process sam_stats {
     cpus params.t
-    publishDir "${params.out_dir}"
+    publishDir "${params.outdir}"
     label "samtools"
 
     input:
