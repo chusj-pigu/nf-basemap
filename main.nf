@@ -13,11 +13,12 @@ def helpMessage() {
          Optional arguments:
          --outdir                       Output directory to place mapped files and reports in [default: output]
          --sample_id                    Will name output files according to sample id [default: reads]
-         --t                            Number of CPUs to use [default: 4]
          --m_bases                      Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
-         --model                        Dorado model to be used. Requires path to model if run with drac profile [default: sup@v4.3.0].
+         --model                        Basecalling model to use [default: sup@v4.3.0].
          --no_mod                       Basecalling without base modification [default: false]
-         -profile                       Use standard for running locally, or drac when running on Digital Research Alliance of Canada [default: standard]
+         --model_path                   Path for the basecalling model, required when running with drac profile [default: path to sup@v4.3.0]
+         --m_bases_path                 Path for the modified basecalling model, required when running with drac profile [default: path to sup@v4.3.0_5mCG_5hmCG]
+         -profile                       Use standard for running locally, or drac when running on Digital Research Alliance of Canada Narval [default: standard]
          --help                         This usage statement.
         """
 }
