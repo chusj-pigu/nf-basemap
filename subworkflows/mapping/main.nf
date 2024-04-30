@@ -1,6 +1,5 @@
 process mapping {
-    cpus params.t
-    publishDir "${params.out_dir}"
+    publishDir "${params.out_dir}", mode : "copy"
     label "minimap"
 
     input:
@@ -11,8 +10,8 @@ process mapping {
     path "${fastq.getBaseName(2)}.sam"
 
     script:
-    def m = params.m ? "-y" : ""
+    def mod = params.no_mod ? "" : "-y"
     """
-    minimap2 -ax map-ont $m -t $task.cpus $ref $fastq > "${fastq.getBaseName(2)}.sam"
+    minimap2 -ax map-ont $mod -t $task.cpus $ref $fastq > "${fastq.getBaseName(2)}.sam"
     """
 }

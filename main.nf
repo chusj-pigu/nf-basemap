@@ -43,7 +43,7 @@ include { multiqc } from './subworkflows/multiqc'
 workflow {
 
     pod5_ch = Channel.fromPath(params.pod5)
-    model_ch = (profile == "standard" || profile == "no_gpus") ? Channel.of(params.model) : Channel.fromPath(params.model)
+    model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model)
     ref_ch = Channel.fromPath(params.ref)
     
     pod5_channel(pod5_ch)
@@ -56,12 +56,12 @@ workflow {
     
     mapping(ref_ch, ubam_to_fastq.out)
     sam_to_bam(mapping.out)
-        sam_sort(sam_to_bam.out)
-        sam_index(sam_sort.out)
-        sam_stats(sam_sort.out)
-        multi_ch = Channel.empty()
-            .mix(qc_fastq.out)
-            .mix(sam_stats.out)
-            .collect()
-        multiqc(multi_ch)
+    sam_sort(sam_to_bam.out)
+    sam_index(sam_sort.out)
+    sam_stats(sam_sort.out)
+    multi_ch = Channel.empty()
+        .mix(qc_fastq.out)
+        .mix(sam_stats.out)
+        .collect()
+    multiqc(multi_ch)
 }

@@ -1,8 +1,6 @@
 process basecall {
-    publishDir "${params.out_dir}"
+    publishDir "${params.out_dir}", mode : "copy"
     label "dorado"
-    label "gpu"
-    cpus params.t
 
     input:
     path pod5
@@ -12,9 +10,10 @@ process basecall {
     path "${params.sample_id}.bam"
 
     script:
-    def mod = params.no_mod ? "" : (profile == "drac" ? "--modified-bases-models ${params.m_bases}" : "--modified-bases ${params.m_bases}")
+    def mod = params.no_mod ? "" : (params.m_bases_path ? "--modified-bases-models ${params.m_bases_path}" : "--modified-bases ${params.m_bases}")
+    def dev = params.dorado_cpu ? '-x "cpu"' : ""
     """
-    dorado duplex $model $pod5 $mod > ${params.sample_id}.bam
+    dorado duplex -b 10 $dev $model $pod5 $mod > ${params.sample_id}.bam
     """
 }
 
