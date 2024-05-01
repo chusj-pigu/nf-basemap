@@ -5,7 +5,7 @@ process multiqc {
     path "${params.out_dir}/*"
 
     output:
-    path "multiqc_report.html"
+    path "${params.out_dir}/multiqc_report.html"
 
     script:
     """
