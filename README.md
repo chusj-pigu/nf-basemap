@@ -17,7 +17,7 @@ nextflow run chusj-pigu/wf-mapping --help
 
 Overview:
 
-This workflow can be run locally or on Compute Canada. To use on Compute Canada, use the `-profile drac` option. For testing purposes, it can be run on cpu only with `-profile no_gpu`. 
+This workflow can be run locally or on Compute Canada. To use on Compute Canada, use the `-profile drac` option. For testing purposes, basecalling can be run on cpu only with `-profile no_gpu`. 
 
 ## 1. Basecalling
 Basecalling is done with [Dorado] on duplex mode with modified base calling by default, using the Super accurate algorithm. The pod5 files are first split by channel to facilitate duplex calling.
