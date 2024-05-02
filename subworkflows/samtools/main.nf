@@ -38,7 +38,7 @@ process sam_index {
     path sorted
 
     output:
-    path "${sorted.baseName}_index.bam"
+    path "${sorted.baseName}_index.bam.bai"
 
     script:
     """
