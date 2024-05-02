@@ -24,6 +24,20 @@ jobs:
         uses: nf-core/setup-nextflow@v1
         with:
           version: "${{ matrix.NXF_VER }}"
+      - name: Cache test data
+        id: cache-testdata
+        uses: actions/cache@v3
+        with:
+          path: test/
+          key: ${{ steps.hash_workspace.outputs.digest }}
+
+      - name: Check out test data
+        if: steps.cache-testdata.outputs.cache-hit != 'true'
+        uses: actions/checkout@v3
+        with:
+          repository: wf-mapping/test
+          path: test/
+          
       - name: Run pipeline with test data
         run: |
           nextflow run ${GITHUB_WORKSPACE} --pod5 ${{ github.workspace }}/test/pod5/ --ref ${{ github.workspace }}/test/ref.fasta -profile test
