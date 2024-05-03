@@ -17,7 +17,7 @@ jobs:
         NXF_VER:
           - "latest-stable"
     steps:
-      - name: Check out pipeline code
+      - name: Check out repository
         uses: actions/checkout@v4
 
       - name: Install Nextflow
@@ -29,20 +29,6 @@ jobs:
         id: hash_workspace
         run: |
           echo "digest=$(echo ${{ github.workspace }} | md5sum | cut -c 1-25)" >> $GITHUB_OUTPUT
-          
-      - name: Cache test data
-        id: cache-testdata
-        uses: actions/cache@v3
-        with:
-          path: test/
-          key: ${{ steps.hash_workspace.outputs.digest }}
-
-      - name: Check out test data
-        if: steps.cache-testdata.outputs.cache-hit != 'true'
-        uses: actions/checkout@v3
-        with:
-          repository: chusj-pigu/wf-mapping
-          path: test/
           
       - name: Run pipeline with test data
         run: |
