@@ -6,6 +6,7 @@ process multiqc {
 
     output:
     path "multiqc_report.html"
+    path "multiqc_data"
 
     script:
     """
