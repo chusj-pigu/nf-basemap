@@ -41,7 +41,7 @@ jobs:
         if: steps.cache-testdata.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
-          repository: chusj-pigu/wf-mapping/
+          repository: chusj-pigu/wf-mapping
           path: test/
           
       - name: Run pipeline with test data
