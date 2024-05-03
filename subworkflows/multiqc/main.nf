@@ -6,11 +6,11 @@ process multiqc {
 
     output:
     path "multiqc_report.html"
-    path "multiqc_data"
 
     script:
+    def datadir = params.git ? "--no-data-dir" : ""
     """
-    multiqc . 
+    multiqc $datadir . 
     """
 
 }
