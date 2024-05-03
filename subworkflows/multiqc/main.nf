@@ -2,7 +2,7 @@ process multiqc {
     publishDir "${params.out_dir}", mode : "copy"
     
     input:
-    path "${params.out_dir}/*"
+    path "*"
 
     output:
     path "multiqc_report.html"
