@@ -41,7 +41,7 @@ jobs:
         if: steps.cache-testdata.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
-          repository: wf-mapping/test
+          repository: wf-mapping/
           path: test/
           
       - name: Run pipeline with test data
