@@ -8,9 +8,8 @@ process multiqc {
     path "multiqc_report.html"
 
     script:
-    def datadir = params.git ? "--no-data-dir" : ""
     """
-    multiqc $datadir -n stdout . > multiqc_report.html
+    multiqc .
     """
 
 }
