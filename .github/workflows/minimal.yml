@@ -24,6 +24,12 @@ jobs:
         uses: nf-core/setup-nextflow@v1
         with:
           version: "${{ matrix.NXF_VER }}"
+
+      - name: Hash Github Workspace
+        id: hash_workspace
+        run: |
+          echo "digest=$(echo ${{ github.workspace }} | md5sum | cut -c 1-25)" >> $GITHUB_OUTPUT
+          
       - name: Cache test data
         id: cache-testdata
         uses: actions/cache@v3
