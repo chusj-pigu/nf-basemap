@@ -44,7 +44,7 @@ include { multiqc } from './subworkflows/multiqc'
 workflow {
 
     pod5_ch = Channel.fromPath(params.pod5)
-    model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model)
+    model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
     ref_ch = Channel.fromPath(params.ref)
     
     pod5_channel(pod5_ch)
