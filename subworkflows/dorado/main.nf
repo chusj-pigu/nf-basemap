@@ -12,8 +12,9 @@ process basecall {
     script:
     def mod = params.no_mod ? "" : (params.m_bases_path ? "--modified-bases-models ${params.m_bases_path}" : "--modified-bases ${params.m_bases}")
     def dev = params.dorado_cpu ? '-x "cpu"' : ""
+    def b = params.b ? "-b $params.b" : ""
     """
-    dorado duplex $dev $model $pod5 $mod > ${params.sample_id}.bam
+    dorado duplex $b $dev $model $pod5 $mod > ${params.sample_id}.bam
     """
 }
 
