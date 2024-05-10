@@ -12,6 +12,6 @@ process mapping {
     script:
     def mod = params.no_mod ? "" : "-y"
     """
-    minimap2 -ax map-ont $mod -t $task.cpus $ref $fastq > "${fastq.getBaseName(2)}.sam"
+    minimap2 -ax map-ont $mod -t $params.map_t $ref $fastq > "${fastq.getBaseName(2)}.sam"
     """
 }
