@@ -6,11 +6,11 @@ process sam_to_bam {
     path sam
 
     output:
-    path "${sam.baseName}.bam"
+    path "${sam.baseName}_all.bam"
 
     script:
     """
-    samtools view -@ $params.threads -e '[qs] >=10' -Sb $sam -o ${sam.baseName}_all.bam
+    samtools view -@ $params.threads -Sb $sam -o ${sam.baseName}_all.bam
     """
 }
 
@@ -22,11 +22,11 @@ process sam_qs_filter {
     path bam
 
     output:
-    path "${sam.baseName}.bam"
+    path "${bam.baseName}_pass.bam"
 
     script:
     """
-    samtools view --no-PG -@ $params.threads -e '[qs] >=10' -b $bam -o ${sam.baseName}_pass.bam
+    samtools view --no-PG -@ $params.threads -e '[qs] >=10' -b $bam -o ${bam.baseName}_pass.bam
     """
 }
 
