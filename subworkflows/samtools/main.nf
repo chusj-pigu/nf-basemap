@@ -10,7 +10,7 @@ process sam_to_bam {
 
     script:
     """
-    samtools view -@ $task.cpus -e '[qs] >=10' -Sb $sam -o ${sam.baseName}.bam
+    samtools view -@ $params.threads -e '[qs] >=10' -Sb $sam -o ${sam.baseName}.bam
     """
 }
 
@@ -26,7 +26,7 @@ process sam_sort {
 
     script:
     """
-    samtools sort -@ $task.cpus $aligned -o ${aligned.baseName}_sorted.bam
+    samtools sort -@ $params.threads $aligned -o ${aligned.baseName}_sorted.bam
     """
 }
 
@@ -42,7 +42,7 @@ process sam_index {
 
     script:
     """
-    samtools index -@ $task.cpus $sorted -o ${sorted.baseName}_index.bam.bai
+    samtools index -@ $params.threads $sorted -o ${sorted.baseName}_index.bam.bai
     """
 }
 
@@ -58,6 +58,6 @@ process sam_stats {
 
     script:
     """
-    samtools stats -@ $task.cpus $sorted > ${sorted.baseName}.stats.txt
+    samtools stats -@ $params.threads $sorted > ${sorted.baseName}.stats.txt
     """
 }
