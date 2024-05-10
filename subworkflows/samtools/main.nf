@@ -10,7 +10,23 @@ process sam_to_bam {
 
     script:
     """
-    samtools view -@ $params.threads -e '[qs] >=10' -Sb $sam -o ${sam.baseName}.bam
+    samtools view -@ $params.threads -e '[qs] >=10' -Sb $sam -o ${sam.baseName}_all.bam
+    """
+}
+
+process sam_qs_filter {
+    publishDir "${params.out_dir}", mode : "copy"
+    label "samtools"
+
+    input:
+    path bam
+
+    output:
+    path "${sam.baseName}.bam"
+
+    script:
+    """
+    samtools view --no-PG -@ $params.threads -e '[qs] >=10' -b $bam -o ${sam.baseName}_pass.bam
     """
 }
 

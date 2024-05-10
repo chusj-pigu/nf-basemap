@@ -36,6 +36,7 @@ include { ubam_to_fastq } from './subworkflows/ubam_fastq'
 include { qc_fastq} from './subworkflows/fastp'
 include { mapping } from './subworkflows/mapping'
 include { sam_to_bam } from './subworkflows/samtools'
+include { sam_qs_filter } from './subworkflows/samtools'
 include { sam_sort } from './subworkflows/samtools'
 include { sam_index } from './subworkflows/samtools'
 include { sam_stats } from './subworkflows/samtools'
@@ -57,7 +58,8 @@ workflow {
     
     mapping(ref_ch, ubam_to_fastq.out)
     sam_to_bam(mapping.out)
-    sam_sort(sam_to_bam.out)
+    sam_qs_filter(sam_to_bam.out)
+    sam_sort(sam_qs_filter.out)
     sam_index(sam_sort.out)
     sam_stats(sam_sort.out)
     multi_ch = Channel.empty()
