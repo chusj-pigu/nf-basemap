@@ -11,7 +11,7 @@ def helpMessage() {
          --ref                          Path to the reference fasta file 
 
          Optional arguments:
-         --outdir                       Output directory to place mapped files and reports in [default: output]
+         --out_dir                       Output directory to place mapped files and reports in [default: output]
          --sample_id                    Will name output files according to sample id [default: reads]
          --m_bases                      Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
          --model                        Basecalling model to use [default: sup@v4.3.0].
