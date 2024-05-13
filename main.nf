@@ -32,11 +32,11 @@ if (params.help) {
 include { basecall } from './subworkflows/dorado'
 include { pod5_channel } from './subworkflows/pod5'
 include { pod5_subset } from './subworkflows/pod5'
-include { ubam_to_fastq } from './subworkflows/ubam_fastq'
-include { qc_fastq} from './subworkflows/fastp'
+include { ubam_to_fastq as ubam_to_fastq_p } from './subworkflows/ubam_fastq'
+include { ubam_to_fastq as ubam_to_fastq_f } from './subworkflows/ubam_fastq'
 include { mapping } from './subworkflows/mapping'
 include { sam_to_bam } from './subworkflows/samtools'
-include { sam_qs_filter } from './subworkflows/samtools'
+include { qs_filter } from './subworkflows/samtools'
 include { sam_sort } from './subworkflows/samtools'
 include { sam_index } from './subworkflows/samtools'
 include { sam_stats } from './subworkflows/samtools'
@@ -52,18 +52,16 @@ workflow {
     pod5_subset(pod5_ch,pod5_channel.out)
     
     basecall(pod5_subset.out, model_ch)
-    
-    ubam_to_fastq(basecall.out)
-    qc_fastq(ubam_to_fastq.out)
-    
-    mapping(ref_ch, ubam_to_fastq.out)
+    qs_filter(basecall.out)
+    fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
+    fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
+
+    mapping(ref_ch, fq_pass)
     sam_to_bam(mapping.out)
-    sam_qs_filter(sam_to_bam.out)
-    sam_sort(sam_qs_filter.out)
+    sam_sort(sam_to_bam.out)
     sam_index(sam_sort.out)
     sam_stats(sam_sort.out)
     multi_ch = Channel.empty()
-        .mix(qc_fastq.out)
         .mix(sam_stats.out)
         .collect()
     multiqc(multi_ch)

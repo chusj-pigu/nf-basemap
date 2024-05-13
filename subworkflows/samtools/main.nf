@@ -6,27 +6,28 @@ process sam_to_bam {
     path sam
 
     output:
-    path "${sam.baseName}_all.bam"
+    path "${sam.baseName}_aligned.bam"
 
     script:
     """
-    samtools view -@ $params.threads -Sb $sam -o ${sam.baseName}_all.bam
+    samtools view --no-PG -@ $params.threads -Sb $sam -o ${sam.baseName}_aligned.bam
     """
 }
 
-process sam_qs_filter {
+process qs_filter {
     publishDir "${params.out_dir}", mode : "copy"
     label "samtools"
 
     input:
-    path bam
+    path ubam
 
     output:
-    path "${bam.baseName}_pass.bam"
+    path "${ubam.baseName}_unaligned_pass.bam", emit: ubam_pass
+    path "${ubam.baseName}_unaligned_fail.bam", emit: ubam_fail
 
     script:
     """
-    samtools view --no-PG -@ $params.threads -e '[qs] >=10' -b $bam -o ${bam.baseName}_pass.bam
+    samtools view --no-PG -@ $params.threads -e '[qs] >=10' -b $ubam --output ${ubam.baseName}_unaligned_pass.bam --unoutput ${ubam.baseName}_unaligned_fail.bam
     """
 }
 
