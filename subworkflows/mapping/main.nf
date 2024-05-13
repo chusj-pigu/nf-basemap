@@ -7,11 +7,10 @@ process mapping {
     path fastq
 
     output:
-    path "${fastq.getBaseName(2)}.sam"
+    path "${params.sample_id}_aligned.sam"
 
     script:
-    def mod = params.no_mod ? "" : "-y"
     """
-    minimap2 -ax map-ont $mod -t $params.threads $ref $fastq > "${fastq.getBaseName(2)}.sam"
+    minimap2 -y -ax map-ont -t $params.threads $ref $fastq > "${params.sample_id}_aligned.sam"
     """
 }

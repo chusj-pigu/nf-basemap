@@ -6,11 +6,11 @@ process sam_to_bam {
     path sam
 
     output:
-    path "${sam.baseName}_aligned.bam"
+    path "${sam.baseName}.bam"
 
     script:
     """
-    samtools view --no-PG -@ $params.threads -Sb $sam -o ${sam.baseName}_aligned.bam
+    samtools view --no-PG -@ $params.threads -Sb $sam -o ${sam.baseName}.bam
     """
 }
 
@@ -55,11 +55,11 @@ process sam_index {
     path sorted
 
     output:
-    path "${sorted.baseName}_index.bam.bai"
+    path "${params.sample_id}_index.bam.bai"
 
     script:
     """
-    samtools index -@ $params.threads $sorted -o ${sorted.baseName}_index.bam.bai
+    samtools index -@ $params.threads $sorted -o ${params.sample_id}_index.bam.bai
     """
 }
 
@@ -71,10 +71,10 @@ process sam_stats {
     path sorted
 
     output:
-    path "${sorted.baseName}.stats.txt"
+    path "${params.sample_id}_alignment.stats.txt"
 
     script:
     """
-    samtools stats -@ $params.threads $sorted > ${sorted.baseName}.stats.txt
+    samtools stats -@ $params.threads $sorted > "${params.sample_id}_alignment.stats.txt"
     """
 }
