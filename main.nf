@@ -40,6 +40,8 @@ include { qs_filter } from './subworkflows/samtools'
 include { sam_sort } from './subworkflows/samtools'
 include { sam_index } from './subworkflows/samtools'
 include { sam_stats } from './subworkflows/samtools'
+include { sam_cov } from './subworkflows/samtools'
+include { sam_depth } from './subworkflows/samtools'
 include { multiqc } from './subworkflows/multiqc'
 
 workflow {
@@ -61,8 +63,14 @@ workflow {
     sam_sort(sam_to_bam.out)
     sam_index(sam_sort.out)
     sam_stats(sam_sort.out)
+    sam_cov(sam_sort.out)
+    sam_depth(sam_sort.out)
+
+    mqc_conf=Channel.fromPath("${projectDir}/config/multiqc_config.yaml", checkIfExists: true)
+
     multi_ch = Channel.empty()
         .mix(sam_stats.out)
+        .mix(sam_cov.out)
         .collect()
-    multiqc(multi_ch)
+    multiqc(mqc_conf,multi_ch)
 }

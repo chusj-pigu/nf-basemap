@@ -1,0 +1,4 @@
+log_filesize_limit: 2000000000
+sp:
+  samtools/coverage:
+    max_filesize: 2000000000

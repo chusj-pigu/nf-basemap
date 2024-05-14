@@ -2,6 +2,7 @@ process multiqc {
     publishDir "${params.out_dir}", mode : "copy"
     
     input:
+    path multiqc_config
     path "*"
 
     output:
@@ -9,7 +10,7 @@ process multiqc {
 
     script:
     """
-    multiqc .
+    multiqc --config $multiqc_config .
     """
 
 }

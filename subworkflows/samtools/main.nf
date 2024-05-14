@@ -78,3 +78,36 @@ process sam_stats {
     samtools stats -@ $params.threads $sorted > "${params.sample_id}_alignment.stats.txt"
     """
 }
+
+process sam_cov {
+    publishDir "${params.out_dir}", mode : "copy"
+    label "samtools"
+
+    input:
+    path sorted
+
+    output:
+    path "${params.sample_id}_alignment.cov.txt"
+
+    script:
+    """
+    samtools coverage $sorted > "${params.sample_id}_alignment.cov.txt"
+    """
+}
+
+process sam_depth {
+    publishDir "${params.out_dir}", mode : "copy"
+    label "samtools"
+
+    input:
+    path sorted
+
+    output:
+    path "${params.sample_id}_av_depth.txt"
+
+    script:
+    """
+    samtools depth -@ $params.threads $sorted | awk '{sum += \$3} END {print "Average depth: " sum/NR}' > ${params.sample_id}_av_depth.txt
+    """
+}
+
