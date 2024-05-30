@@ -1,6 +1,6 @@
 process ubam_to_fastq {
     publishDir "${params.out_dir}", mode : "copy"
-    label "samtools"
+    label "sam_sm"
 
     input:
     path ubam
@@ -11,6 +11,6 @@ process ubam_to_fastq {
     script:
     def mod = params.no_mod ? "" : "-T '*'" 
     """
-    samtools fastq $mod -@ $task.cpus $ubam > "${ubam.baseName}.fq.gz" 
+    samtools fastq $mod -@ $params.threads $ubam > "${ubam.baseName}.fq.gz" 
     """
 }
