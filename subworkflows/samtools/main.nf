@@ -1,6 +1,6 @@
 process sam_to_bam {
     publishDir "${params.out_dir}", mode : "copy"
-    label "samtools"
+    label "sam_big"
 
     input:
     path sam
@@ -16,7 +16,7 @@ process sam_to_bam {
 
 process qs_filter {
     publishDir "${params.out_dir}", mode : "copy"
-    label "samtools"
+    label "sam_sm"
 
     input:
     path ubam
@@ -33,7 +33,7 @@ process qs_filter {
 
 process sam_sort {
     publishDir "${params.out_dir}", mode : "copy"
-    label "samtools"
+    label "sam_big"
 
     input:
     path aligned
@@ -49,7 +49,7 @@ process sam_sort {
 
 process sam_index {
     publishDir "${params.out_dir}", mode : "copy"
-    label "samtools"
+    label "sam_big"
 
     input:
     path sorted
@@ -65,7 +65,7 @@ process sam_index {
 
 process sam_stats {
     publishDir "${params.out_dir}", mode : "copy"
-    label "samtools"
+    label "sam_sm"
 
     input:
     path sorted
@@ -81,7 +81,7 @@ process sam_stats {
 
 process sam_cov {
     publishDir "${params.out_dir}", mode : "copy"
-    label "samtools"
+    label "sam_sm"
 
     input:
     path sorted
@@ -97,7 +97,7 @@ process sam_cov {
 
 process sam_depth {
     publishDir "${params.out_dir}", mode : "copy"
-    label "samtools"
+    label "sam_sm"
 
     input:
     path sorted

@@ -7,11 +7,13 @@ def helpMessage() {
         nextflow run chusj-pigu/wf-mapping --reads SAMPLE_ID.fq.gz --ref REF.fasta
 
         Mandatory arguments:
-         --pod5                         Path to the directory containing pod5 files
+         --pod5 or --fastq              Path to the directory containing pod5 files or fastq files
          --ref                          Path to the reference fasta file 
 
          Optional arguments:
-         --out_dir                       Output directory to place mapped files and reports in [default: output]
+         --no_basecall                  Basecalling step will be skipped, input must me in fastq [default: false]
+         --simplex                      Dorado will basecall in simplex mode [default: false]
+         --out_dir                      Output directory to place mapped files and reports in [default: output]
          --sample_id                    Will name output files according to sample id [default: reads]
          --m_bases                      Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
          --model                        Basecalling model to use [default: sup@v4.3.0].
@@ -46,19 +48,28 @@ include { multiqc } from './subworkflows/multiqc'
 
 workflow {
 
-    pod5_ch = Channel.fromPath(params.pod5)
-    model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
     ref_ch = Channel.fromPath(params.ref)
     
-    pod5_channel(pod5_ch)
-    pod5_subset(pod5_ch,pod5_channel.out)
+    if (params.no_basecall) {
+        fastq_ch = Channel.fromPath(params.fastq)
+        mapping(ref_ch, fastq_ch)
+    }
     
-    basecall(pod5_subset.out, model_ch)
-    qs_filter(basecall.out)
-    fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
-    fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
+    else {
+        pod5_ch = Channel.fromPath(params.pod5)
+        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
+        pod5_channel(pod5_ch)
+        pod5_subset(pod5_ch,pod5_channel.out)
+    
+        basecall(pod5_subset.out, model_ch)
 
-    mapping(ref_ch, fq_pass)
+        qs_filter(basecall.out)
+        fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
+        fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
+
+        mapping(ref_ch, fq_pass)
+    }
+    
     sam_to_bam(mapping.out)
     sam_sort(sam_to_bam.out)
     sam_index(sam_sort.out)
