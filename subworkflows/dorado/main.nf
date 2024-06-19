@@ -1,5 +1,4 @@
 process basecall {
-    publishDir "${params.out_dir}", mode : "copy"
     label "dorado"
 
     input:

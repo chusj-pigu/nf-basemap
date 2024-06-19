@@ -1,5 +1,5 @@
 process mapping {
-    publishDir "${params.out_dir}", mode : "copy"
+    publishDir "${params.out_dir}/alignments", mode : "copy"
     label "minimap"
 
     input:
@@ -7,10 +7,10 @@ process mapping {
     path fastq
 
     output:
-    path "${params.sample_id}_aligned.sam"
+    path "${params.sample_id}.sam"
 
     script:
     """
-    minimap2 -y -ax map-ont -t $params.threads $ref $fastq > "${params.sample_id}_aligned.sam"
+    minimap2 -y -ax map-ont -t $params.threads $ref $fastq > "${params.sample_id}.sam"
     """
 }

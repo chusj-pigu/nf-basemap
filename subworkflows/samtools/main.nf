@@ -1,5 +1,5 @@
 process sam_to_bam {
-    publishDir "${params.out_dir}", mode : "copy"
+    publishDir "${params.out_dir}/alignments", mode : "copy"
     label "sam_big"
 
     input:
@@ -15,7 +15,7 @@ process sam_to_bam {
 }
 
 process qs_filter {
-    publishDir "${params.out_dir}", mode : "copy"
+    publishDir "${params.out_dir}/reads", mode : "copy"
     label "sam_sm"
 
     input:
@@ -32,82 +32,18 @@ process qs_filter {
 }
 
 process sam_sort {
-    publishDir "${params.out_dir}", mode : "copy"
+    publishDir "${params.out_dir}/alignments", mode : "copy"
     label "sam_big"
 
-    input:
-    path aligned
+    input: 
+    path pass_bam
 
     output:
-    path "${aligned.baseName}_sorted.bam"
-
+    tuple path("${pass_bam.baseName}.bam"), path("${pass_bam.baseName}.bam.bai")
+    
     script:
     """
-    samtools sort -@ $params.threads $aligned -o ${aligned.baseName}_sorted.bam
-    """
-}
-
-process sam_index {
-    publishDir "${params.out_dir}", mode : "copy"
-    label "sam_big"
-
-    input:
-    path sorted
-
-    output:
-    path "${params.sample_id}_index.bam.bai"
-
-    script:
-    """
-    samtools index -@ $params.threads $sorted -o ${params.sample_id}_index.bam.bai
-    """
-}
-
-process sam_stats {
-    publishDir "${params.out_dir}", mode : "copy"
-    label "sam_sm"
-
-    input:
-    path sorted
-
-    output:
-    path "${params.sample_id}_alignment.stats.txt"
-
-    script:
-    """
-    samtools stats -@ $params.threads $sorted > "${params.sample_id}_alignment.stats.txt"
-    """
-}
-
-process sam_cov {
-    publishDir "${params.out_dir}", mode : "copy"
-    label "sam_sm"
-
-    input:
-    path sorted
-
-    output:
-    path "${params.sample_id}_alignment.cov.txt"
-
-    script:
-    """
-    samtools coverage $sorted > "${params.sample_id}_alignment.cov.txt"
-    """
-}
-
-process sam_depth {
-    publishDir "${params.out_dir}", mode : "copy"
-    label "sam_sm"
-
-    input:
-    path sorted
-
-    output:
-    path "${params.sample_id}_av_depth.txt"
-
-    script:
-    """
-    samtools depth -@ $params.threads $sorted | awk '{sum += \$3} END {print "Average depth: " sum/NR}' > ${params.sample_id}_av_depth.txt
+    samtools sort -@ $params.threads --write-index $pass_bam -o ${pass_bam.baseName}.bam##idx##${pass_bam.baseName}.bam.bai
     """
 }
 

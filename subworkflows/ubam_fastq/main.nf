@@ -1,5 +1,5 @@
 process ubam_to_fastq {
-    publishDir "${params.out_dir}", mode : "copy"
+    publishDir "${params.out_dir}/reads", mode : "copy"
     label "sam_sm"
 
     input:
@@ -11,6 +11,6 @@ process ubam_to_fastq {
     script:
     def mod = params.no_mod ? "" : "-T '*'" 
     """
-    samtools fastq $mod -@ $params.threads $ubam > "${ubam.baseName}.fq.gz" 
+    samtools fastq $mod -@ $params.threads $ubam | gzip > "${ubam.baseName}.fq.gz" 
     """
 }
