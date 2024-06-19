@@ -1,5 +1,0 @@
-log_filesize_limit: 2000000000
-sp:
-  samtools/coverage:
-    max_filesize: 2000000000
-    contents: "#rname	startpos	endpos	numreads	covbases	coverage	meandepth	meanbaseq	meanmapq"

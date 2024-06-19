@@ -71,10 +71,8 @@ workflow {
     sam_sort(sam_to_bam.out)
     mosdepth(sam_sort.out)
 
-    mqc_conf=Channel.fromPath("${projectDir}/config/multiqc_config.yaml", checkIfExists: true)
-
     multi_ch = Channel.empty()
         .mix(mosdepth.out)
         .collect()
-    multiqc(mqc_conf,multi_ch)
+    multiqc(multi_ch)
 }
