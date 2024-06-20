@@ -3,14 +3,15 @@ process sam_sort {
     label "sam_big"
 
     input: 
-    path pass_bam
+    path sam
 
     output:
-    tuple path("${pass_bam.baseName}.bam"), path("${pass_bam.baseName}.bam.bai")
+    tuple path("${sam.baseName}.bam"), path("${sam.baseName}.bam.bai")
     
     script:
     """
-    samtools sort -@ $params.threads --write-index $pass_bam -o ${pass_bam.baseName}.bam##idx##${pass_bam.baseName}.bam.bai
+    samtools view --no-PG -@ $params.threads -Sb $sam \
+    | samtools sort -@ $params.threads --write-index -o ${sam.baseName}.bam##idx##${sam.baseName}.bam.bai
     """
 }
 

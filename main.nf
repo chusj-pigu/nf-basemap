@@ -38,7 +38,6 @@ include { qs_filter } from './subworkflows/qs_filter'
 include { ubam_to_fastq as ubam_to_fastq_p } from './subworkflows/ubam_fastq'
 include { ubam_to_fastq as ubam_to_fastq_f } from './subworkflows/ubam_fastq'
 include { mapping } from './subworkflows/mapping'
-include { sam_to_bam } from './subworkflows/sam_to_bam'
 include { sam_sort } from './subworkflows/sort_bam'
 include { mosdepth } from './subworkflows/mosdepth'
 include { multiqc } from './subworkflows/multiqc'
@@ -67,8 +66,7 @@ workflow {
         mapping(ref_ch, fq_pass)
     }
     
-    sam_to_bam(mapping.out)
-    sam_sort(sam_to_bam.out)
+    sam_sort(mapping.out)
     mosdepth(sam_sort.out)
 
     multi_ch = Channel.empty()
