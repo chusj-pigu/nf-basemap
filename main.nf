@@ -39,6 +39,7 @@ include { pod5_subset } from './subworkflows/pod5'
 include { qs_filter } from './subworkflows/qs_filter'
 include { ubam_to_fastq as ubam_to_fastq_p } from './subworkflows/ubam_fastq'
 include { ubam_to_fastq as ubam_to_fastq_f } from './subworkflows/ubam_fastq'
+include { nanoplot } from "./subworkflows/nanoplot"
 include { mapping } from './subworkflows/mapping'
 include { sam_sort } from './subworkflows/sort_bam'
 include { mosdepth } from './subworkflows/mosdepth'
@@ -49,13 +50,15 @@ workflow {
     if (params.skip_basecall) {
         ref_ch = Channel.fromPath(params.ref)
         fastq_ch = Channel.fromPath(params.fastq)
+
+        nanoplot(fastq_ch)
         mapping(ref_ch, fastq_ch)
 
         sam_sort(mapping.out)
         mosdepth(sam_sort.out)
 
         multi_ch = Channel.empty()
-            .mix(mosdepth.out)
+            .mix(nanoplot.out,mosdepth.out)
             .collect()
         multiqc(multi_ch)
     }
@@ -71,6 +74,12 @@ workflow {
         qs_filter(basecall.out)
         fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
         fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
+        nanoplot(fq_pass)
+
+        multi_ch = Channel.empty()
+            .mix(nanoplot.out)
+            .collect()
+        multiqc(multi_ch)
 
     } else {
         ref_ch = Channel.fromPath(params.ref)
@@ -85,13 +94,14 @@ workflow {
         fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
         fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
 
+        nanoplot(fq_pass)
         mapping(ref_ch, fq_pass)
 
         sam_sort(mapping.out)
         mosdepth(sam_sort.out)
 
         multi_ch = Channel.empty()
-            .mix(mosdepth.out)
+            .mix(nanoplot.out,mosdepth.out)
             .collect()
         multiqc(multi_ch)
     }
