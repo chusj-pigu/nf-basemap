@@ -72,9 +72,10 @@ workflow {
         basecall(pod5_subset.out, model_ch)
 
         qs_filter(basecall.out)
+        nanoplot(basecall.out)
+
         fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
         fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
-        nanoplot(fq_pass)
 
         multi_ch = Channel.empty()
             .mix(nanoplot.out)
@@ -91,10 +92,11 @@ workflow {
         basecall(pod5_subset.out, model_ch)
 
         qs_filter(basecall.out)
+        nanoplot(basecall.out)
+
         fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
         fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
 
-        nanoplot(fq_pass)
         mapping(ref_ch, fq_pass)
 
         sam_sort(mapping.out)
