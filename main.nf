@@ -8,9 +8,9 @@ def helpMessage() {
 
         Mandatory arguments:
          --pod5 or --fastq              Path to the directory containing pod5 files or fastq files
-         --ref                          Path to the reference fasta file 
 
          Optional arguments:
+         --ref                          Path to the reference fasta file 
          --skip_basecall                Basecalling step will be skipped, input must me in fastq [default: false]
          --skip_mapping                 Mapping will be skipped [default: false]
          --simplex                      Dorado will basecall in simplex mode instead of duplex [default: false]
