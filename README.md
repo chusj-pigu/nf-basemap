@@ -1,6 +1,6 @@
 # nf-wgs
 
-Nexftlow workflow for basecalling and mapping of whole genome Nanopore fastq reads using dorado, minimap2, samtools and multiqc.
+[Nextflow] workflow for basecalling and mapping of whole genome Nanopore fastq reads using dorado, minimap2, samtools and multiqc.
 
 Requires either [Docker] or [Apptainer] installed.
 
@@ -42,6 +42,7 @@ Generates a .sam file, .bam files for sorted reads and bai for indexed reads. Ma
 
 [Docker]: https://www.docker.com
 [Apptainer]: https://apptainer.org
+[Nextflow]: https://www.nextflow.io/docs/latest/index.html
 [Dorado]: https://github.com/nanoporetech/dorado
 [minimap2]: https://lh3.github.io/minimap2/minimap2.html
 [samtools]: http://www.htslib.org
