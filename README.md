@@ -1,19 +1,19 @@
-# nf-wgs
+# nf-basemap
 
-[Nextflow] workflow for basecalling and mapping of whole genome Nanopore fastq reads using dorado, minimap2, samtools and multiqc.
+[Nextflow] workflow for basecalling and mapping of whole genome or whole transcriptome Nanopore fastq reads using dorado, minimap2, samtools and multiqc.
 
 Requires either [Docker] or [Apptainer] installed.
 
 Usage:
 
 ```sh
-nextflow run chusj-pigu/wf-mapping [--pod5 INPUT] | [--fastq INPUT] [--ref REF_GENOME] [OPTIONS]
+nextflow run chusj-pigu/nf-basemap [--pod5 INPUT] | [--fastq INPUT] [--ref REF_GENOME] [OPTIONS]
 ```
 
 To list available options and parameters for this workflow, run :
 
 ``` sh
-nextflow run chusj-pigu/wf-mapping --help
+nextflow run chusj-pigu/nf-basemap --help
 ```
 
 Overview:

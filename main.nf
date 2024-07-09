@@ -51,7 +51,6 @@ workflow {
         ref_ch = Channel.fromPath(params.ref)
         fastq_ch = Channel.fromPath(params.fastq)
 
-        nanoplot(fastq_ch)
         mapping(ref_ch, fastq_ch)
 
         sam_sort(mapping.out)
