@@ -35,13 +35,13 @@ if (params.help) {
 
 include { basecall } from './subworkflows/dorado'
 include { pod5_channel } from './subworkflows/pod5'
-include { pod5_subset } from './subworkflows/pod5'
-include { qs_filter } from './subworkflows/qs_filter'
-include { ubam_to_fastq as ubam_to_fastq_p } from './subworkflows/ubam_fastq'
-include { ubam_to_fastq as ubam_to_fastq_f } from './subworkflows/ubam_fastq'
+include { subset } from './subworkflows/pod5'
+include { qs_filter } from './subworkflows/samtools'
+include { ubam_to_fastq as ubam_to_fastq_p } from './subworkflows/samtools'
+include { ubam_to_fastq as ubam_to_fastq_f } from './subworkflows/samtools'
 include { nanoplot } from "./subworkflows/nanoplot"
-include { mapping } from './subworkflows/mapping'
-include { sam_sort } from './subworkflows/sort_bam'
+include { mapping } from './subworkflows/minimap'
+include { sam_sort } from './subworkflows/samtools'
 include { mosdepth } from './subworkflows/mosdepth'
 include { multiqc } from './subworkflows/multiqc'
 
@@ -66,9 +66,9 @@ workflow {
         pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         pod5_channel(pod5_ch)
-        pod5_subset(pod5_ch,pod5_channel.out)
+        subset(pod5_ch,pod5_channel.out)
     
-        basecall(pod5_subset.out, model_ch)
+        basecall(subset.out, model_ch)
 
         qs_filter(basecall.out)
         nanoplot(basecall.out)
@@ -86,9 +86,9 @@ workflow {
         pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         pod5_channel(pod5_ch)
-        pod5_subset(pod5_ch,pod5_channel.out)
+        subset(pod5_ch,pod5_channel.out)
     
-        basecall(pod5_subset.out, model_ch)
+        basecall(subset.out, model_ch)
 
         qs_filter(basecall.out)
         nanoplot(basecall.out)
