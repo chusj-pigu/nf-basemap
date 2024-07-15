@@ -87,6 +87,7 @@ workflow {
         multiqc(multi_ch)
 
     } else {
+        ref_ch = Channel.fromPath(params.ref)
         basecall(pod5_ch, model_ch)
 
         qs_filter(basecall.out)
