@@ -46,7 +46,18 @@ include { mosdepth } from './subworkflows/mosdepth'
 include { multiqc } from './subworkflows/multiqc'
 
 workflow {
-    
+    take: params.pod5, params.model, params.model_path, params.ref, params.fastq
+    main: 
+    if (params.simplex) {
+        pod5_ch = Channel.fromPath(params.pod5)
+        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
+    } else {
+        pod5_in = Channel.fromPath(params.pod5)
+        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
+        pod5_channel(pod5_in)
+        pod5_ch = subset(pod5_in,pod5_channel.out)
+    }
+
     if (params.skip_basecall) {
         ref_ch = Channel.fromPath(params.ref)
         fastq_ch = Channel.fromPath(params.fastq)
@@ -63,12 +74,8 @@ workflow {
     }
 
     else if (params.skip_mapping) {
-        pod5_ch = Channel.fromPath(params.pod5)
-        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-        pod5_channel(pod5_ch)
-        subset(pod5_ch,pod5_channel.out)
-    
-        basecall(subset.out, model_ch)
+        
+        basecall(pod5_ch, model_ch)
 
         qs_filter(basecall.out)
         nanoplot(basecall.out)
@@ -82,13 +89,7 @@ workflow {
         multiqc(multi_ch)
 
     } else {
-        ref_ch = Channel.fromPath(params.ref)
-        pod5_ch = Channel.fromPath(params.pod5)
-        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-        pod5_channel(pod5_ch)
-        subset(pod5_ch,pod5_channel.out)
-    
-        basecall(subset.out, model_ch)
+        basecall(pod5_ch, model_ch)
 
         qs_filter(basecall.out)
         nanoplot(basecall.out)
@@ -106,4 +107,5 @@ workflow {
             .collect()
         multiqc(multi_ch)
     }
+    emit: sam_sort.out
 }
