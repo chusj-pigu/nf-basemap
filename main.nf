@@ -46,66 +46,63 @@ include { mosdepth } from './subworkflows/mosdepth'
 include { multiqc } from './subworkflows/multiqc'
 
 workflow {
-    take: params.pod5, params.model, params.model_path, params.ref, params.fastq
-    
-    main: {
-
-        if (params.simplex) {
-            pod5_ch = Channel.fromPath(params.pod5)
-            model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-        } else {
-            pod5_in = Channel.fromPath(params.pod5)
-            model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-            pod5_channel(pod5_in)
-            pod5_ch = subset(pod5_in, pod5_channel.out)
-        }
-
-        if (params.skip_basecall) {
-            ref_ch = Channel.fromPath(params.ref)
-            fastq_ch = Channel.fromPath(params.fastq)
-
-            mapping(ref_ch, fastq_ch)
-
-            sam_sort(mapping.out)
-            mosdepth(sam_sort.out)
-
-            multi_ch = Channel.empty()
-                .mix(nanoplot.out, mosdepth.out)
-                .collect()
-            multiqc(multi_ch)
-        } else if (params.skip_mapping) {
-            basecall(pod5_ch, model_ch)
-
-            qs_filter(basecall.out)
-            nanoplot(basecall.out)
-
-            fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
-            fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
-
-            multi_ch = Channel.empty()
-                .mix(nanoplot.out)
-                .collect()
-            multiqc(multi_ch)
-        } else {
-            basecall(pod5_ch, model_ch)
-
-            qs_filter(basecall.out)
-            nanoplot(basecall.out)
-
-            fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
-            fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
-
-            mapping(ref_ch, fq_pass)
-
-            sam_sort(mapping.out)
-            mosdepth(sam_sort.out)
-
-            multi_ch = Channel.empty()
-                .mix(nanoplot.out, mosdepth.out)
-                .collect()
-            multiqc(multi_ch)
-        }
+    if (params.simplex) {
+        pod5_ch = Channel.fromPath(params.pod5)
+        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
+    } else {
+        pod5_in = Channel.fromPath(params.pod5)
+        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
+        pod5_channel(pod5_in)
+        pod5_ch = subset(pod5_in,pod5_channel.out)
     }
 
-    emit: sam_sort.out
+    if (params.skip_basecall) {
+        ref_ch = Channel.fromPath(params.ref)
+        fastq_ch = Channel.fromPath(params.fastq)
+
+        mapping(ref_ch, fastq_ch)
+
+        sam_sort(mapping.out)
+        mosdepth(sam_sort.out)
+
+        multi_ch = Channel.empty()
+            .mix(nanoplot.out,mosdepth.out)
+            .collect()
+        multiqc(multi_ch)
+    }
+
+    else if (params.skip_mapping) {
+        
+        basecall(pod5_ch, model_ch)
+
+        qs_filter(basecall.out)
+        nanoplot(basecall.out)
+
+        fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
+        fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
+
+        multi_ch = Channel.empty()
+            .mix(nanoplot.out)
+            .collect()
+        multiqc(multi_ch)
+
+    } else {
+        basecall(pod5_ch, model_ch)
+
+        qs_filter(basecall.out)
+        nanoplot(basecall.out)
+
+        fq_pass = ubam_to_fastq_p(qs_filter.out.ubam_pass)
+        fq_fail = ubam_to_fastq_f(qs_filter.out.ubam_fail)
+
+        mapping(ref_ch, fq_pass)
+
+        sam_sort(mapping.out)
+        mosdepth(sam_sort.out)
+
+        multi_ch = Channel.empty()
+            .mix(nanoplot.out,mosdepth.out)
+            .collect()
+        multiqc(multi_ch)
+    }
 }
