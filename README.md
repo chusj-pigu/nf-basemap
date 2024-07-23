@@ -22,7 +22,7 @@ This workflow can be run locally or on Compute Canada. To use on Compute Canada,
 
 ## 1. Basecalling
 
-Basecalling is done with [Dorado] on duplex mode with modified base calling by default, using the Super accurate algorithm. The pod5 files are first split by channel to facilitate duplex calling. To use without modified basecalling, use the `--no_mod` option. This can be done in simplex mode using the `--simplex` option, or entirely skipped using the `--skip_basecall` option.
+Basecalling is done with [Dorado] in simplex mode with modified base calling by default, using the Super accurate algorithm. The pod5 files are first split by channel to facilitate duplex calling. To use without modified basecalling, use the `--no_mod` option. This can be done in duplex mode using the `--duplex` option, or entirely skipped using the `--skip_basecall` option.
 
 ## 2. QC stats and filtering
 

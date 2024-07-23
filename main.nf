@@ -13,7 +13,7 @@ def helpMessage() {
          --ref                          Path to the reference fasta file 
          --skip_basecall                Basecalling step will be skipped, input must me in fastq [default: false]
          --skip_mapping                 Mapping will be skipped [default: false]
-         --simplex                      Dorado will basecall in simplex mode instead of duplex [default: false]
+         --duplex                       Dorado will basecall in duplex mode instead of simplex [default: false]
          --out_dir                      Output directory to place mapped files and reports in [default: output]
          --sample_id                    Will name output files according to sample id [default: reads]
          --m_bases                      Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
@@ -46,14 +46,14 @@ include { mosdepth } from './subworkflows/mosdepth'
 include { multiqc } from './subworkflows/multiqc'
 
 workflow {
-    if (params.simplex) {
-        pod5_ch = Channel.fromPath(params.pod5)
-        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-    } else {
+    if (params.duplex) {
         pod5_in = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         pod5_channel(pod5_in)
         pod5_ch = subset(pod5_in,pod5_channel.out)
+    } else {
+        pod5_ch = Channel.fromPath(params.pod5)
+        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
     }
 
     if (params.skip_basecall) {
