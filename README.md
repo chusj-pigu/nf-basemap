@@ -7,13 +7,13 @@ Requires either [Docker] or [Apptainer] installed.
 Usage:
 
 ```sh
-nextflow run chusj-pigu/nf-basemap [--pod5 INPUT] | [--fastq INPUT] [--ref REF_GENOME] [OPTIONS]
+nextflow run chusj-pigu/nf-basemap -r main [--pod5 INPUT] | [--fastq INPUT] [--ref REF_GENOME] [OPTIONS]
 ```
 
 To list available options and parameters for this workflow, run :
 
 ``` sh
-nextflow run chusj-pigu/nf-basemap --help
+nextflow run chusj-pigu/nf-basemap -r main --help
 ```
 
 Overview:
