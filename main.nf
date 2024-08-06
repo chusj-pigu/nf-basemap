@@ -66,7 +66,7 @@ workflow {
         mosdepth(sam_sort.out)
 
         multi_ch = Channel.empty()
-            .mix(nanoplot.out,mosdepth.out)
+            .mix(mosdepth.out)
             .collect()
         multiqc(multi_ch)
     }
