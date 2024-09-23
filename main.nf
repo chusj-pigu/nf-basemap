@@ -33,17 +33,17 @@ if (params.help) {
     exit 0
 }
 
-include { basecall } from './subworkflows/dorado'
-include { pod5_channel } from './subworkflows/pod5'
-include { subset } from './subworkflows/pod5'
-include { qs_filter } from './subworkflows/samtools'
-include { ubam_to_fastq as ubam_to_fastq_p } from './subworkflows/samtools'
-include { ubam_to_fastq as ubam_to_fastq_f } from './subworkflows/samtools'
-include { nanoplot } from "./subworkflows/nanoplot"
-include { mapping } from './subworkflows/minimap'
-include { sam_sort } from './subworkflows/samtools'
-include { mosdepth } from './subworkflows/mosdepth'
-include { multiqc } from './subworkflows/multiqc'
+include { basecall } from './modules/dorado'
+include { pod5_channel } from './modules/pod5'
+include { subset } from './modules/pod5'
+include { qs_filter } from './modules/samtools'
+include { ubam_to_fastq as ubam_to_fastq_p } from './modules/samtools'
+include { ubam_to_fastq as ubam_to_fastq_f } from './modules/samtools'
+include { nanoplot } from "./modules/nanoplot"
+include { mapping } from './modules/minimap'
+include { sam_sort } from './modules/samtools'
+include { mosdepth } from './modules/mosdepth'
+include { multiqc } from './modules/multiqc'
 
 workflow {
     if (params.duplex) {
