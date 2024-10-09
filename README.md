@@ -37,11 +37,11 @@ This workflow can be run locally or on Compute Canada. To use on Compute Canada,
 - `--bed`: Bed file containing regions of interest to compute mapping statistics with mosdepth .
 - `--batch`: Batch size for basecalling; if 0, optimal batch size will be automatically selected [default: 0].
 When running locally:
-- `--m_bases`: Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
 - `--model`: Basecalling model to use [default: sup@v5.0.0].
+- `--m_bases`: Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mC_5hmC].
 When running on Narval:
 - `--model_path`: Path for the basecalling model, required when running with drac profile [default: path to sup@v5.0.0].
-- `--m_bases_path`: Path for the modified basecalling model, required when running with drac profile [default: path to sup@v5.0.0_5mCG_5hmCG].
+- `--m_bases_path`: Path for the modified basecalling model, required when running with drac profile [default: path to sup@v5.0.0_5mC_5hmC].
 
 ## 1. Basecalling
 
