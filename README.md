@@ -2,6 +2,8 @@
 
 [Nextflow] workflow for basecalling and mapping of whole genome or whole transcriptome Nanopore fastq reads using dorado, minimap2, samtools and multiqc.
 
+## Dependencies
+
 Requires either [Docker] or [Apptainer] installed.
 
 Usage:
@@ -19,6 +21,27 @@ nextflow run chusj-pigu/nf-basemap -r main --help
 Overview:
 
 This workflow can be run locally or on Compute Canada. To use on Compute Canada, use the `-profile drac` option. For testing purposes, basecalling can be run on cpu only with `-profile test`.
+
+### Parameters
+
+- `--pod5`: Path to the directory containing pod5.
+- `--fastq`: Path to the directory containing fastq files. Only use if skipping basecalling.
+- `--ref`: Path to the reference fasta file for alignment.
+- `--skip_basecall`: Basecalling step will be skipped; input must be in fastq [default: false].
+- `--skip_mapping`: Mapping will be skipped [default: false].
+- `--duplex`: Dorado will basecall in duplex mode instead of simplex [default: false].
+- `--out_dir`: Output directory to place mapped files and reports in [default: output].
+- `--sample_id`: Will name output files according to sample id [default: reads].
+- `--no_mod`: Basecalling without base modification [default: false].
+- `-profile`: Use standard for running locally, or drac when running on Digital Research Alliance of Canada Narval [default: standard].
+- `--bed`: Bed file containing regions of interest to compute mapping statistics with mosdepth .
+- `--batch`: Batch size for basecalling; if 0, optimal batch size will be automatically selected [default: 0].
+When running locally:
+- `--m_bases`: Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
+- `--model`: Basecalling model to use [default: sup@v5.0.0].
+When running on Narval:
+- `--model_path`: Path for the basecalling model, required when running with drac profile [default: path to sup@v5.0.0].
+- `--m_bases_path`: Path for the modified basecalling model, required when running with drac profile [default: path to sup@v5.0.0_5mCG_5hmCG].
 
 ## 1. Basecalling
 
