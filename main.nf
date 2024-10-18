@@ -38,6 +38,7 @@ include { SIMPLEX } from './subworkflows/simplex'
 include { DUPLEX } from './subworkflows/duplex'
 include { ALIGNMENT } from './subworkflows/mapping'
 include { multiqc } from './modules/multiqc'
+include { publish_artifact } from "./modules/ingress"
 
 workflow {
     if (params.skip_basecall) {
@@ -50,6 +51,8 @@ workflow {
             .mix(ALIGNMENT.out.mosdepth_dist, ALIGNMENT.out.mosdepth_summary, ALIGNMENT.out.mosdepth_bed)
             .collect()
         multiqc(multi_ch)
+
+        publish_artifact(ALIGNMENT.out.bam)
     }
 
     else if (params.duplex) {
@@ -58,10 +61,19 @@ workflow {
         ref_ch = Channel.fromPath(params.ref)
         DUPLEX(pod5_ch, model_ch, ref_ch)
 
+        duplex_out = DUPLEX.out.fq_pass
+            .mix(DUPLEX.out.fq_fail,DUPLEX.out.bam)
+
+        publish_artifact(duplex_out)
+
     } else {
         pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         ref_ch = Channel.fromPath(params.ref)
-        SIMPLEX(pod5_ch, model_ch, ref_ch)
+        
+        simplex_out = SIMPLEX.out.fq_pass
+            .mix(SIMPLEX.out.fq_fail,SIMPLEX.out.bam)
+
+        publish_artifact(simplex_out)
     }
 }
