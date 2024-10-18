@@ -70,6 +70,7 @@ workflow {
         pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         ref_ch = Channel.fromPath(params.ref)
+        SIMPLEX(pod5_ch, model_ch, ref_ch)
         
         simplex_out = SIMPLEX.out.fq_pass
             .mix(SIMPLEX.out.fq_fail,SIMPLEX.out.bam)
