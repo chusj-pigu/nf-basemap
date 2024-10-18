@@ -37,4 +37,9 @@ workflow SIMPLEX {
         multiqc(multi_ch)
     }
 
+    emit:
+    fq_pass = ubam_to_fastq_p.out
+    fq_fail = ubam_to_fastq_f.out
+    bam = ALIGNMENT.out.bam
+
 }
