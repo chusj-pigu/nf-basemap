@@ -38,7 +38,7 @@ workflow DUPLEX {
         ALIGNMENT(ubam_to_fastq_p.out, ref)
 
         multi_ch = Channel.empty()
-            .mix(nanoplot.out,ALIGNMENT.out.mosdepth_dist, ALIGNMENT.out.mosdepth_summary, ALIGNMENT.out.mosdepth_bed)
+            .mix(nanoplot.out,ALIGNMENT.out.mosdepth_all_out)
             .collect()
         multiqc(multi_ch)
     }
