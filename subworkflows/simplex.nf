@@ -10,10 +10,11 @@ workflow SIMPLEX {
     take:
     pod5
     model
+    ubam
     ref
     
     main:
-    basecall(pod5, model)
+    basecall(pod5, model, ubam)
 
     qs_filter(basecall.out)
     nanoplot(basecall.out)
