@@ -12,6 +12,7 @@ workflow DUPLEX {
     take:
     pod5
     model
+    ubam
     ref
     
     main:
@@ -19,7 +20,7 @@ workflow DUPLEX {
     pod5_channel(pod5)
     subset(pod5,pod5_channel.out)
 
-    basecall(subset.out, model)
+    basecall(subset.out, model, ubam)
 
     qs_filter(basecall.out)
     nanoplot(basecall.out)
