@@ -53,7 +53,7 @@ workflow {
         ALIGNMENT(fastq_ch, ref_ch)
 
         multi_ch = Channel.empty()
-            .mix(ALIGNMENT.out.mosdepth_dist, ALIGNMENT.out.mosdepth_summary, ALIGNMENT.out.mosdepth_bed)
+            .mix(ALIGNMENT.out.mosdepth_all_out)
             .collect()
         multiqc(multi_ch)
     }
