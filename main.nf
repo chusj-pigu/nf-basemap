@@ -23,6 +23,8 @@ def helpMessage() {
          --m_bases_path                 Path for the modified basecalling model, required when running with drac profile [default: path to sup@v5.0.0_5mCG_5hmCG]
          -profile                       Use standard for running locally, or drac when running on Digital Research Alliance of Canada Narval [default: standard]
          --bed                          Bed file containing regions of interest to compute mapping statistics with mosdepth
+         --resume                       Use when basecalling crashes and you want to resume from the existing ubam [default: false]
+         --ubam                         Partial ubam that basecalling will resume from [default: NO_FILE]
          --batch                        Batchsize for basecalling, if 0 optimal batchsize will be automatically selected [default: 0]
          --help                         This usage statement.
         """
@@ -40,6 +42,10 @@ include { ALIGNMENT } from './subworkflows/mapping'
 include { multiqc } from './modules/multiqc'
 
 workflow {
+
+    // Create channel for partial ubam to make basecalling resuming possible:
+    partial_ubam = Channel.fromPath(params.ubam)
+
     if (params.skip_basecall) {
         ref_ch = Channel.fromPath(params.ref)
         fastq_ch = Channel.fromPath(params.fastq)
@@ -56,12 +62,12 @@ workflow {
         pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         ref_ch = Channel.fromPath(params.ref)
-        DUPLEX(pod5_ch, model_ch, ref_ch)
+        DUPLEX(pod5_ch, model_ch, partial_ubam, ref_ch)
 
     } else {
         pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         ref_ch = Channel.fromPath(params.ref)
-        SIMPLEX(pod5_ch, model_ch, ref_ch)
+        SIMPLEX(pod5_ch, model_ch, partial_ubam, ref_ch)
     }
 }
