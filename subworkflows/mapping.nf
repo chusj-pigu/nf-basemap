@@ -9,7 +9,9 @@ workflow ALIGNMENT {
     ref
 
     main:
-    mapping(ref, sample_sheet)
+    input_ch = sample_sheet
+        .combine(ref)
+    mapping(input_ch)
     sam_sort(mapping.out)
     bed_ch = bed
         .map( it -> tuple(it, 1796, 0))

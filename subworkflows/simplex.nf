@@ -14,7 +14,10 @@ workflow SIMPLEX {
     ref
     
     main:
-    basecall(sample_sheet, model)
+    input_ch = sample_sheet
+        .combine(model)
+
+    basecall(input_ch)
 
     qs_filter(basecall.out)
 

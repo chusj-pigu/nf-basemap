@@ -20,7 +20,10 @@ workflow DUPLEX {
     pod5_channel(sample_sheet)
     subset(sample_sheet,pod5_channel.out)
 
-    basecall(subset.out, model)
+    input_ch = subset.out
+        .combine(model)
+
+    basecall(input_ch)
 
     qs_filter(basecall.out)
 
