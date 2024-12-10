@@ -8,32 +8,32 @@ include { multiqc } from '../modules/multiqc'
 
 workflow SIMPLEX {
     take:
-    pod5
+    sample_sheet
     model
-    ubam
+    bed
     ref
     
     main:
-    basecall(pod5, model, ubam)
+    basecall(sample_sheet, model)
 
     qs_filter(basecall.out)
+
     nanoplot(basecall.out)
 
     ubam_to_fastq_p(qs_filter.out.ubam_pass)
     ubam_to_fastq_f(qs_filter.out.ubam_fail)
     
     if (params.skip_mapping) {
-
         multi_ch = Channel.empty()
             .mix(nanoplot.out)
             .collect()
         multiqc(multi_ch)
 
     } else {
-        ALIGNMENT(ubam_to_fastq_p.out, ref)
+        ALIGNMENT(ubam_to_fastq_p.out, bed, ref)
 
         multi_ch = Channel.empty()
-            .mix(nanoplot.out,ALIGNMENT.out.mosdepth_all_out)
+            .mix(nanoplot.out,ALIGNMENT.out.mosdepth_dist,ALIGNMENT.out.mosdepth_summ)
             .collect()
         multiqc(multi_ch)
     }

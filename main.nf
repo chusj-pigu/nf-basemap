@@ -43,14 +43,29 @@ include { multiqc } from './modules/multiqc'
 
 workflow {
 
+    // Create channel for bed file 
+    bed_ch = Channel.fromPath(params.bed)
+
     // Create channel for partial ubam to make basecalling resuming possible:
-    partial_ubam = Channel.fromPath(params.ubam)
+    if (params.resume) {
+        partial_ubam = Channel.fromPath(params.ubam)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.sample_id, file(row.ubam)) }
+    
+        sheet_ch = Channel.fromPath(params.sample_sheet)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.sample_id, file(row.path)) }
+            .join(partial_ubam)
+    } else {
+        sheet_ch = Channel.fromPath(params.sample_sheet)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.sample_id, file(row.path), 'null') }
+    }
 
     if (params.skip_basecall) {
         ref_ch = Channel.fromPath(params.ref)
-        fastq_ch = Channel.fromPath(params.fastq)
         
-        ALIGNMENT(fastq_ch, ref_ch)
+        ALIGNMENT(sheet_ch, bed_ch, ref_ch)
 
         multi_ch = Channel.empty()
             .mix(ALIGNMENT.out.mosdepth_all_out)
@@ -59,15 +74,13 @@ workflow {
     }
 
     else if (params.duplex) {
-        pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         ref_ch = Channel.fromPath(params.ref)
-        DUPLEX(pod5_ch, model_ch, partial_ubam, ref_ch)
+        DUPLEX(sheet_ch, model_ch, bed_ch, ref_ch)
 
     } else {
-        pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         ref_ch = Channel.fromPath(params.ref)
-        SIMPLEX(pod5_ch, model_ch, partial_ubam, ref_ch)
+        SIMPLEX(sheet_ch, model_ch, bed_ch, ref_ch)
     }
 }

@@ -4,15 +4,21 @@ include { mosdepth } from '../modules/mosdepth'
 
 workflow ALIGNMENT {
     take:
-    fastq
+    sample_sheet
+    bed
     ref
 
     main:
-    mapping(ref, fastq)
+    mapping(ref, sample_sheet)
     sam_sort(mapping.out)
-    mosdepth(sam_sort.out)
+    bed_ch = bed
+        .map( it -> tuple(it, 1796, 0))
+    mos_in = sam_sort.out
+        .combine(bed_ch)
+    mosdepth(mos_in)
 
     emit: 
     bam = sam_sort.out
-    mosdepth_all_out = mosdepth.out
+    mosdepth_dist = mosdepth.out.dist
+    mosdepth_summ = mosdepth.out.summary
 }
