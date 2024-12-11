@@ -35,4 +35,4 @@ jobs:
           
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} --sample_sheet ${{ github.workspace }}/test/samplesheet.csv --ref ${{ github.workspace }}/test/ref.fasta -profile test
+          nextflow run ${GITHUB_WORKSPACE} --sample_sheet ${{ github.workspace }}/test/samplesheet_git.csv --ref ${{ github.workspace }}/test/ref.fasta -profile test
