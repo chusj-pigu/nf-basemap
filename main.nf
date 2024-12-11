@@ -7,7 +7,7 @@ def helpMessage() {
         nextflow run chusj-pigu/nf-basecall --pod5 /path/to/pod5 --ref /path/to/REF.fasta
 
         Mandatory arguments:
-         --pod5 or --fastq              Path to the directory containing pod5 files or fastq files
+         --sample_sheet             Path to the samplesheet with first column containing sample_id and second column containing the absolute path to fastq or pod5 files (MANDATORY)
 
          Optional arguments:
          --ref                          Path to the reference fasta file 
@@ -15,7 +15,6 @@ def helpMessage() {
          --skip_mapping                 Mapping will be skipped [default: false]
          --duplex                       Dorado will basecall in duplex mode instead of simplex [default: false]
          --out_dir                      Output directory to place mapped files and reports in [default: output]
-         --sample_id                    Will name output files according to sample id [default: reads]
          --m_bases                      Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
          --model                        Basecalling model to use [default: sup@v5.0.0].
          --no_mod                       Basecalling without base modification [default: false]
@@ -24,7 +23,7 @@ def helpMessage() {
          -profile                       Use standard for running locally, or drac when running on Digital Research Alliance of Canada Narval [default: standard]
          --bed                          Bed file containing regions of interest to compute mapping statistics with mosdepth
          --resume                       Use when basecalling crashes and you want to resume from the existing ubam [default: false]
-         --ubam                         Partial ubam that basecalling will resume from [default: NO_FILE]
+         --ubam                         Path to the samplesheet with first column containing sample_id and second column containing the absolute path to ubam file to append to [default: none].
          --batch                        Batchsize for basecalling, if 0 optimal batchsize will be automatically selected [default: 0]
          --help                         This usage statement.
         """
@@ -43,14 +42,29 @@ include { multiqc } from './modules/multiqc'
 
 workflow {
 
+    // Create channel for bed file 
+    bed_ch = Channel.fromPath(params.bed)
+
     // Create channel for partial ubam to make basecalling resuming possible:
-    partial_ubam = Channel.fromPath(params.ubam)
+    if (params.resume) {
+        partial_ubam = Channel.fromPath(params.ubam)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.sample_id, file(row.ubam)) }
+    
+        sheet_ch = Channel.fromPath(params.sample_sheet)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.sample_id, file(row.path)) }
+            .join(partial_ubam)
+    } else {
+        sheet_ch = Channel.fromPath(params.sample_sheet)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.sample_id, file(row.path), 'null') }
+    }
 
     if (params.skip_basecall) {
         ref_ch = Channel.fromPath(params.ref)
-        fastq_ch = Channel.fromPath(params.fastq)
         
-        ALIGNMENT(fastq_ch, ref_ch)
+        ALIGNMENT(sheet_ch, bed_ch, ref_ch)
 
         multi_ch = Channel.empty()
             .mix(ALIGNMENT.out.mosdepth_all_out)
@@ -59,15 +73,13 @@ workflow {
     }
 
     else if (params.duplex) {
-        pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         ref_ch = Channel.fromPath(params.ref)
-        DUPLEX(pod5_ch, model_ch, partial_ubam, ref_ch)
+        DUPLEX(sheet_ch, model_ch, bed_ch, ref_ch)
 
     } else {
-        pod5_ch = Channel.fromPath(params.pod5)
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
         ref_ch = Channel.fromPath(params.ref)
-        SIMPLEX(pod5_ch, model_ch, partial_ubam, ref_ch)
+        SIMPLEX(sheet_ch, model_ch, bed_ch, ref_ch)
     }
 }

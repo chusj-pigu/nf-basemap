@@ -2,8 +2,6 @@ name: minimal test
 # Tests the pipeline with a minimal dataset
 on:
   push:
-    branches:
-      - main
   pull_request:
   release:
     types: [published]
@@ -37,4 +35,4 @@ jobs:
           
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} --pod5 ${{ github.workspace }}/test/pod5/ --ref ${{ github.workspace }}/test/ref.fasta -profile test
+          nextflow run ${GITHUB_WORKSPACE} --sample_sheet ${{ github.workspace }}/test/samplesheet_git.csv --ref ${{ github.workspace }}/test/ref.fasta -profile test
