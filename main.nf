@@ -44,9 +44,10 @@ workflow {
 
     // Create channel for bed file 
     bed_ch = Channel.fromPath(params.bed)
+    ubam_ch = Channel.fromPath("${projectDir}/assets/NO_UBAM")
 
     // Create channel for partial ubam to make basecalling resuming possible:
-    if (params.resume) {
+    if (params.ubam != null) {
         partial_ubam = Channel.fromPath(params.ubam)
             .splitCsv(header: true)
             .map { row -> tuple(row.sample_id, file(row.ubam)) }
@@ -58,7 +59,8 @@ workflow {
     } else {
         sheet_ch = Channel.fromPath(params.sample_sheet)
             .splitCsv(header: true)
-            .map { row -> tuple(row.sample_id, file(row.path), 'null') }
+            .map { row -> tuple(row.sample_id, file(row.path)) }
+            .combine(ubam_ch)
     }
 
     if (params.skip_basecall) {
