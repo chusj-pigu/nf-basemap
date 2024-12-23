@@ -1,4 +1,5 @@
 include { basecall } from '../modules/dorado'
+include { demultiplex } from '../modules/dorado'
 include { qs_filter } from '../modules/samtools'
 include { ubam_to_fastq as ubam_to_fastq_p } from '../modules/samtools'
 include { ubam_to_fastq as ubam_to_fastq_f } from '../modules/samtools'
@@ -19,9 +20,14 @@ workflow SIMPLEX {
 
     basecall(input_ch)
 
-    qs_filter(basecall.out)
-
-    nanoplot(basecall.out)
+    if (params.demux != null) {
+        demultiplex(basecall.out)
+        qs_filter(demultiplex.out)
+        nanoplot(demultiplex.out)
+    } else {
+        qs_filter(basecall.out)
+        nanoplot(basecall.out)
+    }
 
     ubam_to_fastq_p(qs_filter.out.ubam_pass)
     ubam_to_fastq_f(qs_filter.out.ubam_fail)
