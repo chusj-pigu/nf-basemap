@@ -39,22 +39,22 @@ workflow SIMPLEX {
 
         ubam_to_fastq_p(qs_filter.out.ubam_pass)
         ubam_to_fastq_f(qs_filter.out.ubam_fail)
+        
+        if (params.skip_mapping) {
+            // Skip alignment and run multiqc only on nanoplot output
+            multi_ch = nanoplot.out
+                .mix()
+                .collect()
+
+            multiqc(multi_ch)
+        } else {
+            // Perform alignment if skip_mapping is not set
+            ALIGNMENT(ubam_to_fastq_p.out, bed, ref)
+
+            multi_ch = nanoplot.out
+                .mix(ALIGNMENT.out.mosdepth_dist, ALIGNMENT.out.mosdepth_summ)
+                .collect()
+
+            multiqc(multi_ch)
+        }
     }
-
-    
-    if (params.skip_mapping) {
-        multi_ch = Channel.empty()
-            .mix(nanoplot.out)
-            .collect()
-        multiqc(multi_ch)
-
-    } else {
-        ALIGNMENT(ubam_to_fastq_p.out, bed, ref)
-
-        multi_ch = Channel.empty()
-            .mix(nanoplot.out,ALIGNMENT.out.mosdepth_dist,ALIGNMENT.out.mosdepth_summ)
-            .collect()
-        multiqc(multi_ch)
-    }
-
-}
