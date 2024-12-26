@@ -25,8 +25,12 @@ workflow SIMPLEX {
         demultiplex_out = demultiplex.out  // Capture the output channel
 
         split_bams = demultiplex_out.flatMap { sample_id, bam_files ->
-        bam_files.collect { bam -> tuple(sample_id, bam) }
-}
+        bam_files.collect { bam ->
+        // Use the baseName of the BAM file for the output
+            def bam_base = bam.baseName
+            tuple(sample_id,bam_base, bam)  // Create a tuple with the baseName as the key and the BAM file
+            }
+        }
         qs_filter(split_bams)
 
         ubam_to_fastq_p(qs_filter.out.ubam_pass)
@@ -34,7 +38,11 @@ workflow SIMPLEX {
 
 
     } else {
-        qs_filter(basecall.out)
+        basecall_out = basecall.out
+            .map { sample_id, bam -> 
+                tuple(sample_id, sample_id, bam)
+            }
+        qs_filter(basecall_out)
         nanoplot(basecall.out)
 
         ubam_to_fastq_p(qs_filter.out.ubam_pass)
@@ -58,3 +66,4 @@ workflow SIMPLEX {
             multiqc(multi_ch)
         }
     }
+}
