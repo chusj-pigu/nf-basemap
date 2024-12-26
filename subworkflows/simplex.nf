@@ -22,15 +22,25 @@ workflow SIMPLEX {
 
     if (params.demux != null) {
         demultiplex(basecall.out)
-        qs_filter(demultiplex.out)
-        nanoplot(demultiplex.out)
+        demultiplex_out = demultiplex.out  // Capture the output channel
+
+        split_bams = demultiplex_out.flatMap { sample_id, bam_files ->
+        bam_files.collect { bam -> tuple(sample_id, bam) }
+}
+        qs_filter(split_bams)
+
+        ubam_to_fastq_p(qs_filter.out.ubam_pass)
+        ubam_to_fastq_f(qs_filter.out.ubam_fail)
+
+
     } else {
         qs_filter(basecall.out)
         nanoplot(basecall.out)
+
+        ubam_to_fastq_p(qs_filter.out.ubam_pass)
+        ubam_to_fastq_f(qs_filter.out.ubam_fail)
     }
 
-    ubam_to_fastq_p(qs_filter.out.ubam_pass)
-    ubam_to_fastq_f(qs_filter.out.ubam_fail)
     
     if (params.skip_mapping) {
         multi_ch = Channel.empty()
