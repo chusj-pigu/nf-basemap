@@ -27,7 +27,6 @@ This workflow can be run locally or on Compute Canada. To use on Compute Canada,
 - `--sample_sheet`: Path to the samplesheet with first column containing sample_id and second column containing the absolute path to fastq or pod5 files (MANDATORY).
 - `--ref`: Path to the reference fasta file for alignment.
 - `--out_dir`: Output directory to place mapped files and reports in [default: output].
-- `--bed`: Bed file containing regions of interest to compute mapping statistics with mosdepth .
 When running on Digital Research Alliance of Canada Narval:
 - `--model_path`: Path for the basecalling model, required when running with drac profile [default: path to sup@v5.0.0].
 - `--m_bases_path`: Path for the modified basecalling model, required when running with drac profile [default: path to sup@v5.0.0_5mC_5hmC].
@@ -42,7 +41,6 @@ This workflow will output:
 | {sample_id}_passed.fq.gz | Merged raw reads that have passed filter of average QS >= `--minqs` | If --skip_basecall is not used |
 | {sample_id}_failed.fq.gz | Merged raw reads that have failed filter of average QS >= `--minqs` | If --skip_basecall is not used |
 | {sample_id}.{ref}.bam<br>{sample_id}.{ref}.bam.bai | Aligned and sorted bam file mapped to reference `--ref` along with it's index | If --skip_mapping is not used |
-| {sample_id}.{ref}.regions.bed.gz | bed file containing average coverage for each selected region in `--bed` | If `--bed` is provided |
 | multiqc_report.html | [multiqc] report containing [Nanoplot] and [mosdepth] outputs | Always |
 
 ## Parameters
@@ -51,6 +49,7 @@ This workflow will output:
 - `--m_bases`: Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mC_5hmC].
 - `--skip_basecall`: Basecalling step will be skipped; input must be in fastq [default: false].
 - `--skip_mapping`: Mapping will be skipped [default: false].
+- `--demux`: Option to demultiplex fastq reads, kit used has to be provided (ex. SQK-PCB114-24)
 - `--duplex`: Dorado will basecall in duplex mode instead of simplex [default: false].
 - `--resume`: Use when basecalling has stopped without finishing, and you want to resume dorado from where it stopped [default: false]
 - `--no_mod`: Basecalling without base modification [default: false].
@@ -64,6 +63,7 @@ This workflow will output:
 ### 1. Basecalling
 
 Basecalling is done with [Dorado] in simplex mode with modified base calling by default, using the Super accurate algorithm. The pod5 files are first split by channel to facilitate duplex calling. To use without modified basecalling, use the `--no_mod` option. This can be done in duplex mode using the `--duplex` option, or entirely skipped using the `--skip_basecall` option.
+If `--demux KIT` is used, `dorado demux` will be carried out just after basecalling.
 
 ### 2. QC stats and filtering
 
