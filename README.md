@@ -47,6 +47,7 @@ This workflow will output:
 
 - `--model`: Basecalling model to use [default: sup@v5.0.0].
 - `--m_bases`: Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mC_5hmC].
+- `--device`: Parameter to choose device when basecalling. Specify CPU or GPU device: 'auto', 'cpu', 'cuda:all' or 'cuda:<device_id>[,<device_id>...]'. Specifying 'auto' will choose either 'cpu', 'metal' or 'cuda:all' depending on the presence of a GPU device. [nargs=0..1] [default: "auto"]
 - `--skip_basecall`: Basecalling step will be skipped; input must be in fastq [default: false].
 - `--skip_mapping`: Mapping will be skipped [default: false].
 - `--demux`: Option to demultiplex fastq reads, kit used has to be provided (ex. SQK-PCB114-24)
@@ -56,7 +57,6 @@ This workflow will output:
 - `--minqs`: Minimum average read QS score to keep [default: 10]
 - `-profile`: Use standard for running locally, test when running a small local test, drac when running on Digital Research Alliance of Canada Narval and test_drac when running tests on Narval [default: standard].
 - `--batch`: Batch size for basecalling; if 0, optimal batch size will be automatically selected [default: 0].
-- `--dorado_cpu`: Whether to use cpu for basecalling [default: false].
 
 ## Steps
 
