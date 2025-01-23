@@ -39,6 +39,7 @@ if (params.help) {
 include { SIMPLEX } from './subworkflows/simplex'
 include { DUPLEX } from './subworkflows/duplex'
 include { ALIGNMENT } from './subworkflows/mapping'
+include { DEMULTIPLEX } from './subworkflows/demux'
 include { multiqc } from './modules/multiqc'
 
 workflow {
@@ -62,6 +63,13 @@ workflow {
             .splitCsv(header: true)
             .map { row -> tuple(row.sample_id, file(row.path)) }
             .combine(ubam_ch)
+    }
+
+    if (params.demux != null) {
+        demux_sh = Channel.fromPath(params.demux_sheet)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.barcode, row.sample_id) }
+        DEMULTIPLEX(sheet_ch,demux_ch,model_ch,bed_ch,ref_ch)
     }
 
     if (params.skip_basecall) {
