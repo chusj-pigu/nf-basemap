@@ -14,6 +14,8 @@ def helpMessage() {
          --skip_basecall                Basecalling step will be skipped, input must me in fastq [default: false]
          --skip_mapping                 Mapping will be skipped [default: false]
          --duplex                       Dorado will basecall in duplex mode instead of simplex [default: false]
+         --demux                        Option to demultiplex fastq reads, kit used has to be provided (ex. SQK-PCB114-24) [default: null].
+         --demux_samplesheet            If demux option is selected, pass on a samplesheet specifying sample_id for each barcode. First column must be barcode, second column must be sample_id [default: none].
          --out_dir                      Output directory to place mapped files and reports in [default: output]
          --m_bases                      Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
          --model                        Basecalling model to use [default: sup@v5.0.0].
@@ -39,6 +41,7 @@ if (params.help) {
 include { SIMPLEX } from './subworkflows/simplex'
 include { DUPLEX } from './subworkflows/duplex'
 include { ALIGNMENT } from './subworkflows/mapping'
+include { DEMULTIPLEX } from './subworkflows/demux'
 include { multiqc } from './modules/multiqc'
 
 workflow {
@@ -46,6 +49,7 @@ workflow {
     // Create channel for bed file 
     bed_ch = Channel.fromPath(params.bed)
     ubam_ch = Channel.fromPath("${projectDir}/assets/NO_UBAM")
+    ref_ch = Channel.fromPath(params.ref)
 
     // Create channel for partial ubam to make basecalling resuming possible:
     if (params.ubam != null) {
@@ -64,8 +68,14 @@ workflow {
             .combine(ubam_ch)
     }
 
-    if (params.skip_basecall) {
-        ref_ch = Channel.fromPath(params.ref)
+    if (params.demux != null) {
+        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
+        demux_ch = Channel.fromPath(params.demux_sheet)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.barcode, row.sample_id) }
+        DEMULTIPLEX(sheet_ch,demux_ch,model_ch,bed_ch,ref_ch)
+        
+    } else if (params.skip_basecall) {
         
         ALIGNMENT(sheet_ch, bed_ch, ref_ch)
 
@@ -73,16 +83,13 @@ workflow {
             .mix(ALIGNMENT.out.mosdepth_all_out)
             .collect()
         multiqc(multi_ch)
-    }
 
-    else if (params.duplex) {
+    } else if (params.duplex) {
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-        ref_ch = Channel.fromPath(params.ref)
         DUPLEX(sheet_ch, model_ch, bed_ch, ref_ch)
 
     } else {
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-        ref_ch = Channel.fromPath(params.ref)
         SIMPLEX(sheet_ch, model_ch, bed_ch, ref_ch)
     }
 }
