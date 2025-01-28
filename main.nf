@@ -47,6 +47,7 @@ workflow {
     // Create channel for bed file 
     bed_ch = Channel.fromPath(params.bed)
     ubam_ch = Channel.fromPath("${projectDir}/assets/NO_UBAM")
+    ref_ch = Channel.fromPath(params.ref)
 
     // Create channel for partial ubam to make basecalling resuming possible:
     if (params.ubam != null) {
@@ -66,14 +67,13 @@ workflow {
     }
 
     if (params.demux != null) {
-        demux_sh = Channel.fromPath(params.demux_sheet)
+        model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
+        demux_ch = Channel.fromPath(params.demux_sheet)
             .splitCsv(header: true)
             .map { row -> tuple(row.barcode, row.sample_id) }
         DEMULTIPLEX(sheet_ch,demux_ch,model_ch,bed_ch,ref_ch)
-    }
-
-    if (params.skip_basecall) {
-        ref_ch = Channel.fromPath(params.ref)
+        
+    } else if (params.skip_basecall) {
         
         ALIGNMENT(sheet_ch, bed_ch, ref_ch)
 
@@ -81,16 +81,13 @@ workflow {
             .mix(ALIGNMENT.out.mosdepth_all_out)
             .collect()
         multiqc(multi_ch)
-    }
 
-    else if (params.duplex) {
+    } else if (params.duplex) {
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-        ref_ch = Channel.fromPath(params.ref)
         DUPLEX(sheet_ch, model_ch, bed_ch, ref_ch)
 
     } else {
         model_ch = params.model ? Channel.of(params.model) : Channel.fromPath(params.model_path)
-        ref_ch = Channel.fromPath(params.ref)
         SIMPLEX(sheet_ch, model_ch, bed_ch, ref_ch)
     }
 }

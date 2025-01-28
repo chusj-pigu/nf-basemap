@@ -26,9 +26,10 @@ workflow DEMULTIPLEX {
 
     split_bams = demultiplex_out.flatMap { sample_id, bam_files ->
     bam_files.collect { bam ->
-        // Use the baseName of the BAM file for the output
-        def bam_base = bam.baseName
-        tuple(sample_id,bam_base,bam)  // Create a tuple with the baseName as the key and the BAM file
+    // Use the baseName of the BAM file
+        def bam_base = bam.baseName.replaceFirst(/^.*?(SQK-[\w-]+barcode\d{2})$/, '$1')
+    // Create a tuple with the extracted baseName and BAM file
+        tuple(sample_id, bam_base, bam)
         }
     }
     qs_filter(split_bams)
