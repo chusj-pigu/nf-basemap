@@ -14,6 +14,8 @@ def helpMessage() {
          --skip_basecall                Basecalling step will be skipped, input must me in fastq [default: false]
          --skip_mapping                 Mapping will be skipped [default: false]
          --duplex                       Dorado will basecall in duplex mode instead of simplex [default: false]
+         --demux                        Option to demultiplex fastq reads, kit used has to be provided (ex. SQK-PCB114-24) [default: null].
+         --demux_samplesheet            If demux option is selected, pass on a samplesheet specifying sample_id for each barcode. First column must be barcode, second column must be sample_id [default: none].
          --out_dir                      Output directory to place mapped files and reports in [default: output]
          --m_bases                      Modified bases to be called, separated by commas if more than one is desired. Requires path to model if run with drac profile [default: 5mCG_5hmCG].
          --model                        Basecalling model to use [default: sup@v5.0.0].
