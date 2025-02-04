@@ -31,6 +31,7 @@ When running on Digital Research Alliance of Canada Narval:
 - `--model_path`: Path for the basecalling model, required when running with drac profile [default: path to sup@v5.0.0].
 - `--m_bases_path`: Path for the modified basecalling model, required when running with drac profile [default: path to sup@v5.0.0_5mC_5hmC].
 - `--ubam`: Path to the samplesheet with first column containing sample_id and second column containing the absolute path to ubam file to append to [default: none].
+- `--demux_sheet`: If demux option is selected, pass on a samplesheet specifying sample_id for each barcode. First column must be barcode, second column must be sample_id [default: none].
 
 ## Outputs
 
@@ -50,7 +51,7 @@ This workflow will output:
 - `--device`: Parameter to choose device when basecalling. Specify CPU or GPU device: 'auto', 'cpu', 'cuda:all' or 'cuda:<device_id>[,<device_id>...]'. Specifying 'auto' will choose either 'cpu', 'metal' or 'cuda:all' depending on the presence of a GPU device. [nargs=0..1] [default: "auto"]
 - `--skip_basecall`: Basecalling step will be skipped; input must be in fastq [default: false].
 - `--skip_mapping`: Mapping will be skipped [default: false].
-- `--demux`: Option to demultiplex fastq reads, kit used has to be provided (ex. SQK-PCB114-24)
+- `--demux`: Option to demultiplex fastq reads, kit used has to be provided (ex. SQK-PCB114-24) [default: null].
 - `--duplex`: Dorado will basecall in duplex mode instead of simplex [default: false].
 - `--resume`: Use when basecalling has stopped without finishing, and you want to resume dorado from where it stopped [default: false]
 - `--no_mod`: Basecalling without base modification [default: false].
